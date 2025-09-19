@@ -1,34 +1,16 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontendtp/Connexion.dart';
+import 'package:frontendtp/accueuil.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Todo App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'To-Do App'),
-    );
-  }
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
@@ -50,12 +32,56 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void navPageConnection(){
+    Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const LoginPage(),
+        ),
+    );
+}
+
+  @override
+  void navPageAccueuil() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (context) => const HomePage()));
+  }
+
+  @override
+  void requeteInscription() async{
+    var reponse = await Dio().get("");
+  }
+
+  void connection(){
+    final username = _usernameController.text.trim();
+    final pw = _passwordController.text.trim();
+    final pwConfirm = _confirmPasswordController.text.trim();
+
+    if(!username.isEmpty && !pw.isEmpty && !pwConfirm.isEmpty){
+      requeteInscription();
+      navPageAccueuil();
+    }
+    else if(pwConfirm != pw){
+      //error
+    }
+    else if(username.isEmpty || username.length < 4){
+      //error
+    }
+    else if(pw.isEmpty || username.length < 7){
+      //error
+    }
+    else if(pwConfirm.isEmpty || username.length < 7){
+      //error
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("Inscription"),
       ),
       body: Center(
         child: Column(
@@ -70,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white
               ),
             ),
-            SizedBox(height: 200),
+            SizedBox(height: 150),
             SizedBox(
               width: 350,
               child: TextField(
@@ -136,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () => (),
+              onPressed: connection,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
@@ -151,7 +177,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 elevation: 5,
               ),
               child: Text("Continuer"),
-            )
+            ),
+            SizedBox(height: 32),
+            Text(
+                style: TextStyle(
+                  color: Colors.white
+                ),
+                "Vous avez déja un compte?"),
+            TextButton(onPressed: navPageConnection,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.blueAccent,
+                ),
+                child: Text(
+                    "Se connecter",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16
+                    ),
+            ),
+      )
           ],
         ),
       ),
