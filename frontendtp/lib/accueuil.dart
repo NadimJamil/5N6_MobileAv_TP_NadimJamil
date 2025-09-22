@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
+
+import 'class/tache.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,13 +16,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<String> listeTache = ["A", "B", "C"];
+  List<Tache> listeTache = [
+    Tache(
+      nom: "A",
+      avancement: 0,
+      tempsEcoule: 0,
+      dateLimite: DateTime(2025, 10, 1),
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
     for (int i = 0; i < 10; i++) {
-      listeTache.add("Tache #$i");
+      listeTache.add(Tache(nom:"Tache #$i",avancement: 0,tempsEcoule: 0,dateLimite: DateTime(2025, 10, 1)));
     }
   }
 
@@ -51,35 +61,11 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         itemCount: listeTache.length,
         itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: Offset(2, 2),
-                ),
-              ],
-              border: Border.all(
-                color: Colors.white,
-                width: 1,
-              ),
-            ),
-            child: ListTile(
-              title: Center(
-                child: Text(
-                  listeTache[index],
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-              onTap: () {
+          return CarteListe(
+              tache: listeTache[index],
+            onTap: (){
                 navConsultation();
-              },
-            ),
+            },
           );
         },
       ),
@@ -93,9 +79,9 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: Colors.white, width: 2),
         ),
-        elevation: 6, // shadow
+        elevation: 6,
         child: const Icon(
-          Icons.add, // plus icon
+          Icons.add,
           size: 32,
         ),
       ),
