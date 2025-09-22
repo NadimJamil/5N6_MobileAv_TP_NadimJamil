@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'class/tache.dart';
+
 class consultation extends StatefulWidget {
-  const consultation({super.key});
+  final Tache tache;
+
+  const consultation({super.key, required this.tache});
 
   final String title = "Consultation";
 
@@ -11,7 +15,6 @@ class consultation extends StatefulWidget {
 
 class _consultationState extends State<consultation> {
   double rating = 0.0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +49,7 @@ class _consultationState extends State<consultation> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Tâche #1",
+                    widget.tache.nom,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -54,32 +57,9 @@ class _consultationState extends State<consultation> {
                     ),
                   ),
                   const SizedBox(height: 50),
-                  Row(
-                    children: const [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Nom :",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          "Bob",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
 
                   Row(
-                    children: const [
+                    children: [
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -94,7 +74,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "50%",
+                          widget.tache.avancement.toString(),
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -103,7 +83,7 @@ class _consultationState extends State<consultation> {
                   const SizedBox(height: 20),
 
                   Row(
-                    children: const [
+                    children: [
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -118,7 +98,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "2025-10-01",
+                          widget.tache.dateLimite.toString().split(' ')[0],
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -128,7 +108,7 @@ class _consultationState extends State<consultation> {
                   const SizedBox(height: 20),
 
                   Row(
-                    children: const [
+                    children: [
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -143,7 +123,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "100%",
+                          widget.tache.tempsEcoule.toString() + "%",
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),

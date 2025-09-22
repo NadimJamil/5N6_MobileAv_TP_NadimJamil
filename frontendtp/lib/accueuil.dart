@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  Tache? tache;
   List<Tache> listeTache = [
     Tache(
       nom: "A",
@@ -41,14 +41,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void navConsultation() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const consultation(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,10 +53,15 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         itemCount: listeTache.length,
         itemBuilder: (context, index) {
+          final selectedTache = listeTache[index];
           return CarteListe(
-              tache: listeTache[index],
+              tache: selectedTache,
             onTap: (){
-                navConsultation();
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => consultation(tache: selectedTache),
+                ),
+              );
             },
           );
         },
