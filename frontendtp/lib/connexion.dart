@@ -1,7 +1,10 @@
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/accueuil.dart';
+import 'package:frontendtp/class/reponseConnexion.dart';
 import 'package:frontendtp/class/requeteConnexion.dart';
-import 'package:frontendtp/http/requetes.dart';
 import 'package:frontendtp/inscription.dart';
 
 class LoginPage extends StatefulWidget {
@@ -38,27 +41,33 @@ class _LoginPageState extends State<LoginPage> {
     ).push(MaterialPageRoute<void>(builder: (context) => const HomePage()));
   }
 
-  void _login() async{
+  void _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-      RequeteConnexion req = RequeteConnexion(
+    var dio = Dio();
+    var cookieJar = CookieJar();
+    dio.interceptors.add(CookieManager(cookieJar));
+
+    try {
+      var req = RequeteConnexion(
         nom: email,
         motDePasse: password,
       );
-
-      try{
-        var reponse = await SingletonDio().signin(req);
-        print("lllll");
-        if(reponse == 200){
-          print("lllll");
-          navPageAccueuil();
-        }
-        print(reponse);
-      }
-      catch(e){
-        print("Erreur inscription: $e");
-      }
+      var reponse = await dio.post(
+        "http://10.0.2.2:8080/id/connexion",
+        data: req.toJson(),
+      );
+      var rep = ReponseConnexion.fromJson(reponse.data);
+      print("Connexion réussie : ${rep.nomUtilisateur}");
+      navPageAccueuil();
+    }
+    catch (e) {
+      print("Erreur inscription: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Échec de l'inscription")),
+      );
+    }
   }
 
   @override
@@ -66,7 +75,10 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme
+            .of(context)
+            .colorScheme
+            .inversePrimary,
         title: Text(widget.title),
       ),
       body: Center(

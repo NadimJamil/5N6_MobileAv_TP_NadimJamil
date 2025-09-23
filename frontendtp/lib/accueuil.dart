@@ -1,7 +1,11 @@
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'class/tache.dart';
 import 'inscription.dart';
@@ -48,6 +52,33 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  Future<void> deconnexion(BuildContext context) async {
+    try {
+      final dio = Dio();
+
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final cj = PersistCookieJar(storage: FileStorage(appDocDir.path + "/.cookies/"));
+
+      dio.interceptors.add(CookieManager(cj));
+
+      final response = await dio.post('http://10.0.2.2/id/deconnexion');
+
+      if (response.statusCode == 200) {
+        await cj.deleteAll();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SignUpPage()),
+              (route) => false,
+        );
+      } else {
+        print("Erreur lors de la déconnexion : ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Erreur de connexion au serveur : $e");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +146,7 @@ class _HomePageState extends State<HomePage> {
               selected: _selectedIndex == 2,
               onTap: () {
                 _onItemTapped(2);
+                deconnexion(context);
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (context) => const SignUpPage(),
