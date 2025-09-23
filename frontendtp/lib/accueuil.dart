@@ -4,6 +4,7 @@ import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
 
 import 'class/tache.dart';
+import 'inscription.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,15 +16,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
   Tache? tache;
   List<Tache> listeTache = [
     Tache(
       nom: "A",
-      avancement: 0,
-      tempsEcoule: 0,
+      avancement: 23,
+      tempsEcoule: 32,
       dateLimite: DateTime(2025, 10, 1),
     ),
   ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   void initState() {
@@ -49,22 +57,73 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Accueil"),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        itemCount: listeTache.length,
-        itemBuilder: (context, index) {
-          final selectedTache = listeTache[index];
-          return CarteListe(
-              tache: selectedTache,
-            onTap: (){
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => consultation(tache: selectedTache),
-                ),
-              );
-            },
-          );
-        },
+      body: Center(
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          itemCount: listeTache.length,
+          itemBuilder: (context, index) {
+            final selectedTache = listeTache[index];
+            return CarteListe(
+                tache: selectedTache,
+              onTap: (){
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => consultation(tache: selectedTache),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('Menu', style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                height: 1.2,
+              ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Accueil'),
+              selected: _selectedIndex == 0,
+              onTap: () {
+                _onItemTapped(0);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Création de tâche'),
+              selected: _selectedIndex == 1,
+              onTap: () {
+                _onItemTapped(1);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const creation(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Déconnexion'),
+              selected: _selectedIndex == 2,
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const SignUpPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

@@ -42,24 +42,23 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isNotEmpty && password.isNotEmpty) {
       RequeteConnexion req = RequeteConnexion(
         nom: email,
         motDePasse: password,
       );
+
       try{
         var reponse = await SingletonDio().signin(req);
+        print("lllll");
+        if(reponse == 200){
+          print("lllll");
+          navPageAccueuil();
+        }
         print(reponse);
       }
       catch(e){
-        print(e);
+        print("Erreur inscription: $e");
       }
-      navPageAccueuil();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email & password')),
-      );
-    }
   }
 
   @override

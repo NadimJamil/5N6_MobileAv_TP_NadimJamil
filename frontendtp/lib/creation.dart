@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/accueuil.dart';
 import 'package:intl/intl.dart';
+
+import 'inscription.dart';
 
 class creation extends StatefulWidget {
   const creation({super.key});
@@ -9,6 +12,7 @@ class creation extends StatefulWidget {
 }
 
 class _creationState extends State<creation> {
+  int _selectedIndex = 0;
   final TextEditingController _nomTacheController = TextEditingController();
   DateTime? _dateLimite;
 
@@ -38,6 +42,12 @@ class _creationState extends State<creation> {
     Navigator.of(context).pop();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +55,57 @@ class _creationState extends State<creation> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Création de tâche"),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Accueil'),
+              selected: _selectedIndex == 0,
+              onTap: () {
+                _onItemTapped(0);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const HomePage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Création de tâche'),
+              selected: _selectedIndex == 1,
+              onTap: () {
+                _onItemTapped(1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Déconnexion'),
+              selected: _selectedIndex == 2,
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const SignUpPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -120,4 +181,5 @@ class _creationState extends State<creation> {
       ),
     );
   }
+
 }

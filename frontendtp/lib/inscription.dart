@@ -62,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
         confirmationMotDePasse: _confirmPasswordController.text.trim(),
       );
       var reponse = await dio.post(
-        "http://localhost:8080/id/inscription",
+        "http://10.0.2.2:8080/id/inscription",
         data: req.toJson(),
       );
 

@@ -24,7 +24,6 @@ class CarteListe extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Nom
               Text(
                 tache.nom,
                 style: const TextStyle(
@@ -53,8 +52,6 @@ class CarteListe extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-
-              // Temps écoulé
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -64,8 +61,6 @@ class CarteListe extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-
-              // Deadline
               Row(
                 children: [
                   const Icon(Icons.calendar_today, size: 18, color: Colors.white70),

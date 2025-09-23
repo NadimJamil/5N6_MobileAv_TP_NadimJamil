@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:uuid/uuid.dart';
 
 class Tache {
@@ -7,6 +5,7 @@ class Tache {
   String nom;
   double avancement;
   double tempsEcoule;
+  DateTime dateCreation;
   DateTime dateLimite;
 
   Tache({
@@ -14,5 +13,6 @@ class Tache {
     required this.avancement,
     required this.tempsEcoule,
     required this.dateLimite,
-  }) : idTache = const Uuid().v4();
+  })  : idTache = const Uuid().v4(),
+        dateCreation = DateTime.now();
 }

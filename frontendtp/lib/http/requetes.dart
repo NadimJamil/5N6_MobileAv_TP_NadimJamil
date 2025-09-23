@@ -18,7 +18,7 @@ class SingletonDio {
   Future<ReponseConnexion> signin(RequeteConnexion req) async {
     try {
       var response = await SingletonDio.getDio()
-          .post('http://localhost:8080/id/connexion', data: req.toJson());
+          .post('http://10.0.2.2/id/connexion', data: req.toJson());
       print(response);
       return ReponseConnexion.fromJson(response.data);
     } catch (e) {

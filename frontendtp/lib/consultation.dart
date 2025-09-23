@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'accueuil.dart';
 import 'class/tache.dart';
+import 'creation.dart';
+import 'inscription.dart';
 
 class consultation extends StatefulWidget {
   final Tache tache;
-
   const consultation({super.key, required this.tache});
 
   final String title = "Consultation";
@@ -14,7 +16,29 @@ class consultation extends StatefulWidget {
 }
 
 class _consultationState extends State<consultation> {
+  int _selectedIndex = 0;
   double rating = 0.0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  double calculerPourcentageTempsRestant() {
+    if (widget.tache.dateLimite == null) return 0;
+
+    final maintenant = DateTime.now();
+    final fin = widget.tache.dateLimite!;
+
+    if (maintenant.isAfter(fin)) return 0;
+
+    final totalDuration = fin.difference(maintenant).inSeconds;
+    final pourcentage = (totalDuration / fin.difference(maintenant).inSeconds) * 100;
+
+    return pourcentage;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +98,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          widget.tache.avancement.toString(),
+                          widget.tache.avancement.toString() + "%",
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -123,7 +147,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          widget.tache.tempsEcoule.toString() + "%",
+                          "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -135,7 +159,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          "Slider : ",
+                          "Changer progression : ",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -144,22 +168,75 @@ class _consultationState extends State<consultation> {
                         ),
                       ),
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: Slider(
-                          value: rating,
+                          value: widget.tache.avancement,
                           onChanged: (newRating) {
-                            setState(() => rating = newRating);
+                            setState(() => widget.tache.avancement = newRating);
                           },
-                          divisions: 10,
-                          label: rating.toStringAsFixed(1),
+                          divisions: 20,
+                          label: widget.tache.avancement.toStringAsFixed(1),
                           min: 0,
-                          max: 5,
+                          max: 100,
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('Menu', style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                height: 1.2,
+              ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Accueil'),
+              selected: _selectedIndex == 0,
+              onTap: () {
+                _onItemTapped(0);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const HomePage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Création de tâche'),
+              selected: _selectedIndex == 1,
+              onTap: () {
+                _onItemTapped(1);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const creation(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Déconnexion'),
+              selected: _selectedIndex == 2,
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const SignUpPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
