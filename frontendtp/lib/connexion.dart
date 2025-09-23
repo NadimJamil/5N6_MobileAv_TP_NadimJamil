@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontendtp/accueuil.dart';
+import 'package:frontendtp/class/requeteConnexion.dart';
+import 'package:frontendtp/http/requetes.dart';
 import 'package:frontendtp/inscription.dart';
 
 class LoginPage extends StatefulWidget {
@@ -36,14 +38,22 @@ class _LoginPageState extends State<LoginPage> {
     ).push(MaterialPageRoute<void>(builder: (context) => const HomePage()));
   }
 
-  void _login() {
+  void _login() async{
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isNotEmpty && password.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Logging in as $email...')));
+      RequeteConnexion req = RequeteConnexion(
+        nom: email,
+        motDePasse: password,
+      );
+      try{
+        var reponse = await SingletonDio().signin(req);
+        print(reponse);
+      }
+      catch(e){
+        print(e);
+      }
       navPageAccueuil();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,4 +1,9 @@
+import 'dart:ffi';
+
+import 'package:uuid/uuid.dart';
+
 class Tache {
+  String idTache;
   String nom;
   double avancement;
   double tempsEcoule;
@@ -9,5 +14,5 @@ class Tache {
     required this.avancement,
     required this.tempsEcoule,
     required this.dateLimite,
-  });
+  }) : idTache = const Uuid().v4();
 }

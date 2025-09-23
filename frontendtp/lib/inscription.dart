@@ -1,7 +1,11 @@
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/Connexion.dart';
 import 'package:frontendtp/accueuil.dart';
+import 'package:frontendtp/class/reponseConnexion.dart';
+import 'class/requeteInscription.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -32,13 +36,11 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   @override
-  void navPageConnection(){
-    Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (context) => const LoginPage(),
-        ),
-    );
-}
+  void navPageConnection() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (context) => const LoginPage()));
+  }
 
   @override
   void navPageAccueuil() {
@@ -48,30 +50,31 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   @override
-  void requeteInscription() async{
-    var reponse = await Dio().get("");
-  }
+  void reqInscription() async {
+    var dio = Dio();
+    var cookieJar = CookieJar();
+    dio.interceptors.add(CookieManager(cookieJar));
 
-  void connection(){
-    final username = _usernameController.text.trim();
-    final pw = _passwordController.text.trim();
-    final pwConfirm = _confirmPasswordController.text.trim();
+    try {
+      var req = RequeteInscription(
+        nom: _usernameController.text.trim(),
+        motDePasse: _passwordController.text.trim(),
+        confirmationMotDePasse: _confirmPasswordController.text.trim(),
+      );
+      var reponse = await dio.post(
+        "http://localhost:8080/id/inscription",
+        data: req.toJson(),
+      );
 
-    if(!username.isEmpty && !pw.isEmpty && !pwConfirm.isEmpty){
-      requeteInscription();
+      print(reponse.data);
+      var rep = ReponseConnexion.fromJson(reponse.data);
+      print("Inscription réussie : ${rep.nomUtilisateur}");
       navPageAccueuil();
-    }
-    else if(pwConfirm != pw){
-      //error
-    }
-    else if(username.isEmpty || username.length < 4){
-      //error
-    }
-    else if(pw.isEmpty || username.length < 7){
-      //error
-    }
-    else if(pwConfirm.isEmpty || username.length < 7){
-      //error
+    } catch (e) {
+      print("Erreur inscription: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Échec de l'inscription")),
+      );
     }
   }
 
@@ -93,7 +96,7 @@ class _SignUpPageState extends State<SignUpPage> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white
+                color: Colors.white,
               ),
             ),
             SizedBox(height: 150),
@@ -104,14 +107,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _usernameController,
                 decoration: InputDecoration(
                   labelText: "Entrez votre nom d'utilisateur",
-                  labelStyle: TextStyle(
-                    color: Colors.white
-                  ),
+                  labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 1,
-                    ),
+                    borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                 ),
               ),
@@ -126,14 +124,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: "Entrez votre mot de passe",
-                  labelStyle: TextStyle(
-                      color: Colors.white
-                  ),
+                  labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 1,
-                    ),
+                    borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                 ),
               ),
@@ -148,29 +141,21 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: "Entrez votre mot de passe",
-                  labelStyle: TextStyle(
-                      color: Colors.white
-                  ),
+                  labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 1,
-                    ),
+                    borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                 ),
               ),
             ),
             SizedBox(height: 32),
             ElevatedButton(
-              onPressed: connection,
+              onPressed: reqInscription,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 64, vertical: 16),
-                textStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -180,22 +165,17 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             SizedBox(height: 32),
             Text(
-                style: TextStyle(
-                  color: Colors.white
-                ),
-                "Vous avez déja un compte?"),
-            TextButton(onPressed: navPageConnection,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blueAccent,
-                ),
-                child: Text(
-                    "Se connecter",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16
-                    ),
+              style: TextStyle(color: Colors.white),
+              "Vous avez déja un compte?",
             ),
-      )
+            TextButton(
+              onPressed: navPageConnection,
+              style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
+              child: Text(
+                "Se connecter",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
         ),
       ),
