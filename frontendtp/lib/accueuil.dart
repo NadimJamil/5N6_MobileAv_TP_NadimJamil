@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
@@ -55,17 +56,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> deconnexion(BuildContext context) async {
     try {
-      final dio = Dio();
 
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final cj = PersistCookieJar(storage: FileStorage(appDocDir.path + "/.cookies/"));
-
-      dio.interceptors.add(CookieManager(cj));
-
-      final response = await dio.post('http://10.0.2.2/id/deconnexion');
-
+      final response = await SingletonDio.getDio().post('http://10.0.2.2:8080/id/deconnexion');
       if (response.statusCode == 200) {
-        await cj.deleteAll();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const SignUpPage()),
               (route) => false,

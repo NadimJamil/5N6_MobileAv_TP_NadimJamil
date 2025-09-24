@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/Connexion.dart';
+import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
 import 'class/requeteInscription.dart';
@@ -51,9 +52,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void reqInscription() async {
-    var dio = Dio();
-    var cookieJar = CookieJar();
-    dio.interceptors.add(CookieManager(cookieJar));
 
     try {
       var req = RequeteInscription(
@@ -61,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
         motDePasse: _passwordController.text.trim(),
         confirmationMotDePasse: _confirmPasswordController.text.trim(),
       );
-      var reponse = await dio.post(
+      var reponse = await SingletonDio.getDio().post(
         "http://10.0.2.2:8080/id/inscription",
         data: req.toJson(),
       );

@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
 import 'package:frontendtp/class/requeteConnexion.dart';
@@ -45,16 +46,12 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    var dio = Dio();
-    var cookieJar = CookieJar();
-    dio.interceptors.add(CookieManager(cookieJar));
-
     try {
       var req = RequeteConnexion(
         nom: email,
         motDePasse: password,
       );
-      var reponse = await dio.post(
+      var reponse = await SingletonDio.getDio().post(
         "http://10.0.2.2:8080/id/connexion",
         data: req.toJson(),
       );

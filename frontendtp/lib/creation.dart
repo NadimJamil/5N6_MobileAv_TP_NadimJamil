@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
 import 'package:intl/intl.dart';
 
+import 'class/transfert.dart';
 import 'inscription.dart';
 
 class creation extends StatefulWidget {
@@ -37,15 +39,28 @@ class _creationState extends State<creation> {
     }
   }
 
-  void _ajouterTache() {
-    if (_nomTacheController.text.isEmpty || _dateLimite == null) return;
-    Navigator.of(context).pop();
-  }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<void> creerTache() async {
+
+    var req = RequeteAjoutTache(
+      _nomTacheController.text,
+      _dateLimite!,
+    );
+
+    try {
+      var reponse = await SingletonDio.getDio().post(
+        'http://10.0.2.2:8080/tache/ajout',
+        data: req.toJson()
+      );
+      Navigator.of(context).pop();
+    }  catch (e) {
+      print("Erreur de création : ");
+    }
   }
 
   @override
@@ -159,7 +174,7 @@ class _creationState extends State<creation> {
               ),
               const SizedBox(height: 50),
               ElevatedButton(
-                onPressed: _ajouterTache,
+                onPressed: creerTache,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.greenAccent.shade700,
                   foregroundColor: Colors.white,
