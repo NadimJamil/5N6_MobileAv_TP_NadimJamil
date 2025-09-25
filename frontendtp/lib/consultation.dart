@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/class/reponseAccueilItem.dart';
 
 import 'accueuil.dart';
@@ -6,19 +7,27 @@ import 'class/tache.dart';
 import 'creation.dart';
 import 'inscription.dart';
 
-class consultation extends StatefulWidget {
+class Consultation extends StatefulWidget {
   final ReponseAccueilItem tache;
-  const consultation({super.key, required this.tache});
+  const Consultation({super.key, required this.tache});
 
   final String title = "Consultation";
 
   @override
-  State<consultation> createState() => _consultationState();
+  State<Consultation> createState() => _ConsultationState();
 }
 
-class _consultationState extends State<consultation> {
+class _ConsultationState extends State<Consultation> {
   int _selectedIndex = 0;
-  double rating = 0.0;
+
+  late ReponseAccueilItem detailTache;
+
+  @override
+  void initState() {
+    super.initState();
+    detailTache = widget.tache;
+    requeteChargerDetail();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -27,17 +36,33 @@ class _consultationState extends State<consultation> {
   }
 
   double calculerPourcentageTempsRestant() {
-    if (widget.tache.dateLimite == null) return 0;
-
     final maintenant = DateTime.now();
-    final fin = widget.tache.dateLimite!;
+    final fin = detailTache.dateLimite;
 
-    if (maintenant.isAfter(fin)) return 0;
+    if (maintenant.isAfter(fin)) return 100;
 
-    final totalDuration = fin.difference(maintenant).inSeconds;
-    final pourcentage = (totalDuration / fin.difference(maintenant).inSeconds) * 100;
+    final dureeTotale = fin.difference(maintenant).inSeconds;
+    final dureeEcoulee = DateTime.now().difference(maintenant).inSeconds;
 
-    return pourcentage;
+    if (dureeTotale <= 0) return 100;
+
+    return (dureeEcoulee / dureeTotale) * 100;
+  }
+
+  Future<void> requeteChargerDetail() async {
+    try {
+      var reponse = await SingletonDio.getDio().get(
+        "http://10.0.2.2:8080/tache/detail/${widget.tache.id}",
+      );
+      setState(() {
+        detailTache = ReponseAccueilItem.fromJson(reponse.data);
+      });
+    } catch (e) {
+      print("Erreur chargement détail: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erreur de chargement du détail")),
+      );
+    }
   }
 
   @override
@@ -66,7 +91,7 @@ class _consultationState extends State<consultation> {
                     color: Colors.black.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -74,7 +99,7 @@ class _consultationState extends State<consultation> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.tache.nom,
+                    detailTache.nom,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -85,7 +110,7 @@ class _consultationState extends State<consultation> {
 
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         flex: 2,
                         child: Text(
                           "Avancement :",
@@ -99,8 +124,8 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          widget.tache.pourcentageAvancement.toString() + "%",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          "${detailTache.pourcentageAvancement}%",
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
                     ],
@@ -109,7 +134,7 @@ class _consultationState extends State<consultation> {
 
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         flex: 2,
                         child: Text(
                           "Deadline :",
@@ -123,8 +148,8 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          widget.tache.dateLimite.toString().split(' ')[0],
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          detailTache.dateLimite.toString().split(' ')[0],
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
                     ],
@@ -134,7 +159,7 @@ class _consultationState extends State<consultation> {
 
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         flex: 2,
                         child: Text(
                           "Pourcentage de temps écoulé :",
@@ -149,15 +174,17 @@ class _consultationState extends State<consultation> {
                         flex: 3,
                         child: Text(
                           "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 20),
+
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         flex: 2,
                         child: Text(
                           "Changer progression : ",
@@ -171,12 +198,20 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 4,
                         child: Slider(
-                          value: widget.tache.pourcentageAvancement / 100,
-                          onChanged: (newRating) {
-                            setState(() => widget.tache.pourcentageAvancement = newRating as int);
+                          value: detailTache.pourcentageAvancement.toDouble(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              detailTache = ReponseAccueilItem(
+                                id: detailTache.id,
+                                nom: detailTache.nom,
+                                pourcentageAvancement: newValue.round(),
+                                pourcentageTemps: detailTache.pourcentageTemps,
+                                dateLimite: detailTache.dateLimite,
+                              );
+                            });
                           },
-                          divisions: 20,
-                          label: widget.tache.pourcentageAvancement.toStringAsFixed(1),
+                          divisions: 100,
+                          label: "${detailTache.pourcentageAvancement}%",
                           min: 0,
                           max: 100,
                         ),
@@ -195,12 +230,14 @@ class _consultationState extends State<consultation> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Menu', style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                height: 1.2,
-              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  height: 1.2,
+                ),
               ),
             ),
             ListTile(

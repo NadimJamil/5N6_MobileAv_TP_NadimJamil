@@ -70,8 +70,6 @@ class _HomePageState extends State<HomePage> {
       var reponse = await SingletonDio.getDio().get(
           "http://10.0.2.2:8080/tache/accueil"
       );
-
-
       List<dynamic> jsonList = reponse.data;
       if(jsonList != null){
         print("Liste des tâches reçue : $jsonList");
@@ -108,7 +106,7 @@ class _HomePageState extends State<HomePage> {
               onTap: (){
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (context) => consultation(tache: selectedTache),
+                    builder: (context) => Consultation(tache: selectedTache),
                   ),
                 );
               },
