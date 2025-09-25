@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/class/reponseAccueilItem.dart';
 
 import 'accueuil.dart';
 import 'class/tache.dart';
@@ -6,7 +7,7 @@ import 'creation.dart';
 import 'inscription.dart';
 
 class consultation extends StatefulWidget {
-  final Tache tache;
+  final ReponseAccueilItem tache;
   const consultation({super.key, required this.tache});
 
   final String title = "Consultation";
@@ -98,7 +99,7 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          widget.tache.avancement.toString() + "%",
+                          widget.tache.pourcentageAvancement.toString() + "%",
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -170,12 +171,12 @@ class _consultationState extends State<consultation> {
                       Expanded(
                         flex: 4,
                         child: Slider(
-                          value: widget.tache.avancement,
+                          value: widget.tache.pourcentageAvancement / 100,
                           onChanged: (newRating) {
-                            setState(() => widget.tache.avancement = newRating);
+                            setState(() => widget.tache.pourcentageAvancement = newRating as int);
                           },
                           divisions: 20,
-                          label: widget.tache.avancement.toStringAsFixed(1),
+                          label: widget.tache.pourcentageAvancement.toStringAsFixed(1),
                           min: 0,
                           max: 100,
                         ),

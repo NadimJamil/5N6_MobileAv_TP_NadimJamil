@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -9,6 +11,7 @@ import 'package:frontendtp/creation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'class/tache.dart';
+import 'class/reponseAccueilItem.dart';
 import 'inscription.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,14 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   Tache? tache;
-  List<Tache> listeTache = [
-    Tache(
-      nom: "A",
-      avancement: 23,
-      tempsEcoule: 32,
-      dateLimite: DateTime(2025, 10, 1),
-    ),
-  ];
+  List<ReponseAccueilItem> listeTache = [];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -41,9 +37,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 10; i++) {
-      listeTache.add(Tache(nom:"Tache #$i",avancement: 0,tempsEcoule: 0,dateLimite: DateTime(2025, 10, 1)));
-    }
+    requeteListeTache();
   }
 
   void navCreation() {
@@ -71,6 +65,28 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void requeteListeTache() async {
+    try {
+      var reponse = await SingletonDio.getDio().get(
+          "http://10.0.2.2:8080/tache/accueil"
+      );
+
+
+      List<dynamic> jsonList = reponse.data;
+      if(jsonList != null){
+        print("Liste des tâches reçue : $jsonList");
+        this.listeTache = jsonList.map((json) => ReponseAccueilItem.fromJson(json)).toList();
+      }
+
+      setState(() {});
+    }
+    catch (e) {
+      print("Erreur de chargement: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erreur d'affichage de liste")),
+      );
+    }
+  }
 
 
   @override

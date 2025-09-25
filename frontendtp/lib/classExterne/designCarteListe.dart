@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontendtp/class/reponseAccueilItem.dart';
 
 import '../class/tache.dart';
 
 class CarteListe extends StatelessWidget {
-  final Tache tache;
+  final ReponseAccueilItem tache;
   final VoidCallback? onTap;
 
   const CarteListe({super.key, required this.tache, this.onTap});
@@ -39,12 +40,12 @@ class CarteListe extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Avancement", style: TextStyle(color: Colors.white70)),
-                  Text("${tache.avancement}%", style: const TextStyle(color: Colors.white)),
+                  Text("${tache.pourcentageAvancement}%", style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const SizedBox(height: 4),
               LinearProgressIndicator(
-                value: tache.avancement / 100,
+                value: tache.pourcentageAvancement / 100,
                 backgroundColor: Colors.white24,
                 color: Colors.greenAccent,
                 minHeight: 8,
@@ -56,7 +57,7 @@ class CarteListe extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Temps écoulé", style: TextStyle(color: Colors.white70)),
-                  Text("${tache.tempsEcoule}%", style: const TextStyle(color: Colors.white)),
+                  Text("${tache.pourcentageTemps}%", style: const TextStyle(color: Colors.white)),
                 ],
               ),
 
