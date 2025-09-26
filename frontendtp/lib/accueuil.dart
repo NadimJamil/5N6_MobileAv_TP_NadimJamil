@@ -40,12 +40,13 @@ class _HomePageState extends State<HomePage> {
     requeteListeTache();
   }
 
-  void navCreation() {
-    Navigator.of(context).push(
+  void navCreation() async{
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => const creation(),
       ),
     );
+    requeteListeTache();
   }
 
   Future<void> deconnexion(BuildContext context) async {
@@ -133,6 +134,7 @@ class _HomePageState extends State<HomePage> {
               selected: _selectedIndex == 0,
               onTap: () {
                 _onItemTapped(0);
+                requeteListeTache();
                 Navigator.pop(context);
               },
             ),
@@ -141,11 +143,7 @@ class _HomePageState extends State<HomePage> {
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => const creation(),
-                  ),
-                );
+                navCreation;
               },
             ),
             ListTile(

@@ -21,7 +21,7 @@ class ReponseAccueilItem {
       nom: json['nom'] as String,
       pourcentageAvancement: json['pourcentageAvancement'] as int,
       pourcentageTemps: json['pourcentageTemps'] as int,
-      dateLimite: json['dateLimite'] as DateTime,
+      dateLimite: DateTime.parse(json['dateLimite'] as String),
     );
   }
 }

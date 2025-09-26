@@ -4,7 +4,7 @@ class ReponseDetailTache {
   final DateTime dateLimite;
   final List<ChangementAvancement> changements;
   final int pourcentageAvancement;
-  final double pourcentageTemps;
+  final int pourcentageTemps;
 
   ReponseDetailTache({
     required this.id,
@@ -24,7 +24,7 @@ class ReponseDetailTache {
           .map((e) => ChangementAvancement.fromJson(e))
           .toList(),
       pourcentageAvancement: json['pourcentageAvancement'] as int,
-      pourcentageTemps: json['pourcentageTemps'] as double,
+      pourcentageTemps: json['pourcentageTemps'] as int,
     );
   }
 }

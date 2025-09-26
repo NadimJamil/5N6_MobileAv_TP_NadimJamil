@@ -47,6 +47,25 @@ class _creationState extends State<creation> {
 
   Future<void> creerTache() async {
 
+    if (_dateLimite == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez sélectionner une date limite.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    if (_nomTacheController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez entrer un nom pour la tâche.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     var req = RequeteAjoutTache(
       _nomTacheController.text,
       _dateLimite!,
@@ -104,7 +123,7 @@ class _creationState extends State<creation> {
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
-                Navigator.pop(context);
+                Navigator.of(context).pop(true);
               },
             ),
             ListTile(
