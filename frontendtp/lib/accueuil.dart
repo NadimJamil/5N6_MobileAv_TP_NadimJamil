@@ -5,11 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
+import 'package:frontendtp/class/reponseConnexion.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'class/tache.dart';
 import 'class/reponseAccueilItem.dart';
 import 'inscription.dart';
@@ -25,7 +25,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  Tache? tache;
   List<ReponseAccueilItem> listeTache = [];
 
   void _onItemTapped(int index) {
@@ -40,23 +39,22 @@ class _HomePageState extends State<HomePage> {
     requeteListeTache();
   }
 
-  void navCreation() async{
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const creation(),
-      ),
-    );
+  void navCreation() async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (context) => const creation()));
     requeteListeTache();
   }
 
   Future<void> deconnexion(BuildContext context) async {
     try {
-
-      final response = await SingletonDio.getDio().post('http://10.0.2.2:8080/id/deconnexion');
+      final response = await SingletonDio.getDio().post(
+        'http://10.0.2.2:8080/id/deconnexion',
+      );
       if (response.statusCode == 200) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const SignUpPage()),
-              (route) => false,
+          (route) => false,
         );
       } else {
         print("Erreur lors de la déconnexion : ${response.statusCode}");
@@ -69,24 +67,24 @@ class _HomePageState extends State<HomePage> {
   void requeteListeTache() async {
     try {
       var reponse = await SingletonDio.getDio().get(
-          "http://10.0.2.2:8080/tache/accueil"
+        "http://10.0.2.2:8080/tache/accueil",
       );
       List<dynamic> jsonList = reponse.data;
-      if(jsonList != null){
+      if (jsonList != null) {
         print("Liste des tâches reçue : $jsonList");
-        this.listeTache = jsonList.map((json) => ReponseAccueilItem.fromJson(json)).toList();
+        this.listeTache = jsonList
+            .map((json) => ReponseAccueilItem.fromJson(json))
+            .toList();
       }
 
       setState(() {});
-    }
-    catch (e) {
+    } catch (e) {
       print("Erreur de chargement: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erreur d'affichage de liste")),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,8 +101,8 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (context, index) {
             final selectedTache = listeTache[index];
             return CarteListe(
-                tache: selectedTache,
-              onTap: (){
+              tache: selectedTache,
+              onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (context) => Consultation(tache: selectedTache),
@@ -119,14 +117,16 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Menu', style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                height: 1.2,
-              ),
+              child: Text(
+                SessionUtilisateur().nomUtilisateur ?? 'Utilisateur',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  height: 1.2,
+                ),
               ),
             ),
             ListTile(
@@ -134,8 +134,8 @@ class _HomePageState extends State<HomePage> {
               selected: _selectedIndex == 0,
               onTap: () {
                 _onItemTapped(0);
-                requeteListeTache();
                 Navigator.pop(context);
+                requeteListeTache();
               },
             ),
             ListTile(
@@ -143,7 +143,8 @@ class _HomePageState extends State<HomePage> {
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
-                navCreation;
+                Navigator.pop(context);
+                navCreation();
               },
             ),
             ListTile(
@@ -173,13 +174,9 @@ class _HomePageState extends State<HomePage> {
           side: const BorderSide(color: Colors.white, width: 2),
         ),
         elevation: 6,
-        child: const Icon(
-          Icons.add,
-          size: 32,
-        ),
+        child: const Icon(Icons.add, size: 32),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
-

@@ -57,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       var rep = ReponseConnexion.fromJson(reponse.data);
       print("Connexion réussie : ${rep.nomUtilisateur}");
+      SessionUtilisateur().nomUtilisateur = rep.nomUtilisateur;
       navPageAccueuil();
     }
     catch (e) {

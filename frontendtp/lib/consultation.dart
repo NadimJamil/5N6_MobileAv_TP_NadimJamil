@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/class/reponseAccueilItem.dart';
+import 'package:frontendtp/class/reponseDetailTache.dart';
 
 import 'accueuil.dart';
 import 'class/tache.dart';
@@ -19,13 +20,20 @@ class Consultation extends StatefulWidget {
 
 class _ConsultationState extends State<Consultation> {
   int _selectedIndex = 0;
-
-  late ReponseAccueilItem detailTache;
+  late ReponseDetailTache detailTache;
 
   @override
   void initState() {
     super.initState();
-    detailTache = widget.tache;
+    print("Loading detail for task ID: ${widget.tache.id}");
+    detailTache = ReponseDetailTache(
+      id: 0,
+      nom: '',
+      pourcentageAvancement: 0,
+      pourcentageTemps: 0,
+      dateLimite: DateTime.now(),
+      changements: [],
+    );
     requeteChargerDetail();
   }
 
@@ -55,13 +63,24 @@ class _ConsultationState extends State<Consultation> {
         "http://10.0.2.2:8080/tache/detail/${widget.tache.id}",
       );
       setState(() {
-        detailTache = ReponseAccueilItem.fromJson(reponse.data);
+        detailTache = ReponseDetailTache.fromJson(reponse.data);
       });
     } catch (e) {
       print("Erreur chargement détail: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erreur de chargement du détail")),
       );
+    }
+  }
+
+  Future<void> mettreAJourAvancement(int idTache, int valeur) async {
+    try {
+      await SingletonDio.getDio().get(
+        "http://10.0.2.2:8080/tache/progres/$idTache/$valeur",
+      );
+      await requeteChargerDetail();
+    } catch (e) {
+      print("Erreur lors de la mise à jour de l'avancement : $e");
     }
   }
 
@@ -199,16 +218,19 @@ class _ConsultationState extends State<Consultation> {
                         flex: 4,
                         child: Slider(
                           value: detailTache.pourcentageAvancement.toDouble(),
-                          onChanged: (newValue) {
+                          onChanged: (newValue) async {
+                            final nouveauPourcentage = newValue.round();
                             setState(() {
-                              detailTache = ReponseAccueilItem(
+                              detailTache = ReponseDetailTache(
                                 id: detailTache.id,
                                 nom: detailTache.nom,
-                                pourcentageAvancement: newValue.round(),
+                                pourcentageAvancement: nouveauPourcentage,
                                 pourcentageTemps: detailTache.pourcentageTemps,
                                 dateLimite: detailTache.dateLimite,
+                                changements: detailTache.changements,
                               );
                             });
+                            await mettreAJourAvancement(detailTache.id, nouveauPourcentage);
                           },
                           divisions: 100,
                           label: "${detailTache.pourcentageAvancement}%",

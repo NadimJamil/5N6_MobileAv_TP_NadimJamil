@@ -23,8 +23,8 @@ class ReponseDetailTache {
       changements: (json['changements'] as List)
           .map((e) => ChangementAvancement.fromJson(e))
           .toList(),
-      pourcentageAvancement: json['pourcentageAvancement'] as int,
-      pourcentageTemps: json['pourcentageTemps'] as int,
+      pourcentageAvancement: (json['pourcentageAvancement'] as num).toInt(),
+      pourcentageTemps: (json['pourcentageTemps'] as num).toInt(),
     );
   }
 }

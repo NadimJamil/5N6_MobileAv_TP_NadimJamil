@@ -12,3 +12,14 @@ class SingletonDio {
     return dio;
   }
 }
+
+class SessionUtilisateur {
+  static final SessionUtilisateur _instance = SessionUtilisateur._internal();
+  String? nomUtilisateur;
+
+  factory SessionUtilisateur() {
+    return _instance;
+  }
+
+  SessionUtilisateur._internal();
+}
