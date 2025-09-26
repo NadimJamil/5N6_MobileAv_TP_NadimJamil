@@ -198,9 +198,7 @@ class _ConsultationState extends State<Consultation> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
                   Row(
                     children: [
                       const Expanded(
@@ -218,7 +216,7 @@ class _ConsultationState extends State<Consultation> {
                         flex: 4,
                         child: Slider(
                           value: detailTache.pourcentageAvancement.toDouble(),
-                          onChanged: (newValue) async {
+                          onChanged: (newValue){
                             final nouveauPourcentage = newValue.round();
                             setState(() {
                               detailTache = ReponseDetailTache(
@@ -230,7 +228,9 @@ class _ConsultationState extends State<Consultation> {
                                 changements: detailTache.changements,
                               );
                             });
-                            await mettreAJourAvancement(detailTache.id, nouveauPourcentage);
+                          },
+                          onChangeEnd: (newValue) async {
+                            await mettreAJourAvancement(detailTache.id, detailTache.pourcentageAvancement);
                           },
                           divisions: 100,
                           label: "${detailTache.pourcentageAvancement}%",
