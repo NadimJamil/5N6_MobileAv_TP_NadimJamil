@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/class/reponseAccueilItem.dart';
 import 'package:frontendtp/class/reponseDetailTache.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'accueuil.dart';
 import 'class/tache.dart';
@@ -20,7 +22,38 @@ class Consultation extends StatefulWidget {
 
 class _ConsultationState extends State<Consultation> {
   int _selectedIndex = 0;
+  final ImagePicker picker = ImagePicker();
   late ReponseDetailTache detailTache;
+  String imagePath = "";
+
+  Future<void> selectionnerImage() async{
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if(image == null){
+      return;
+    }
+
+    try{
+      String filename = image.name;
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(image.path, filename: filename),
+      });
+      Response response = await SingletonDio.getDio().post(
+        "http://10.0.2.2:8080/tache/detail/",
+        data: formData
+      );
+      if(response.statusCode == 200){
+        String id = response.data.toString();
+        String imageUrl = "http://10.0.2.2:8080/tache/file/$id";
+
+        setState(() {
+          imagePath = imageUrl;
+        });
+      }
+    }
+    catch(e){
+      print("Erreur lors de l’envoi de l’image : $e");
+    }
+  }
 
   @override
   void initState() {
