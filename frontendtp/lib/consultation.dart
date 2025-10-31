@@ -24,36 +24,7 @@ class _ConsultationState extends State<Consultation> {
   int _selectedIndex = 0;
   final ImagePicker picker = ImagePicker();
   late ReponseDetailTache detailTache;
-  String imagePath = "";
-
-  Future<void> selectionnerImage() async{
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if(image == null){
-      return;
-    }
-
-    try{
-      String filename = image.name;
-      FormData formData = FormData.fromMap({
-        "file": await MultipartFile.fromFile(image.path, filename: filename),
-      });
-      Response response = await SingletonDio.getDio().post(
-        "http://10.0.2.2:8080/tache/detail/",
-        data: formData
-      );
-      if(response.statusCode == 200){
-        String id = response.data.toString();
-        String imageUrl = "http://10.0.2.2:8080/tache/file/$id";
-
-        setState(() {
-          imagePath = imageUrl;
-        });
-      }
-    }
-    catch(e){
-      print("Erreur lors de l’envoi de l’image : $e");
-    }
-  }
+  String? imagePath = "";
 
   @override
   void initState() {
@@ -117,6 +88,36 @@ class _ConsultationState extends State<Consultation> {
     }
   }
 
+  Future<void> selectionnerImage() async{
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if(image == null){
+      return;
+    }
+
+    try{
+      String filename = image.name;
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(image.path, filename: filename),
+        "taskID": detailTache.id,
+      });
+      Response response = await SingletonDio.getDio().post(
+          "http://10.0.2.2:8080/fichier",
+          data: formData
+      );
+      if(response.statusCode == 200){
+        String id = response.data.toString();
+        String imageUrl = "http://10.0.2.2:8080/fichier/$id?largeur=1080";
+
+        setState(() {
+          imagePath = imageUrl;
+        });
+      }
+    }
+    catch(e){
+      print("Erreur lors de l’envoi de l’image : $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,150 +131,197 @@ class _ConsultationState extends State<Consultation> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 100),
-            Container(
-              width: double.infinity,
-              height: 500,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    detailTache.nom,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
-                  const SizedBox(height: 50),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      detailTache.nom,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
 
-                  Row(
-                    children: [
-                      const Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Avancement :",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Avancement :",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          "${detailTache.pourcentageAvancement}%",
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      const Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Deadline :",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            "${detailTache.pourcentageAvancement}%",
+                            style: const TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          detailTache.dateLimite.toString().split(' ')[0],
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      const Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Pourcentage de temps écoulé :",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Date limite :",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Changer progression : ",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            detailTache.dateLimite.toString().split(' ')[0],
+                            style: const TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Slider(
-                          value: detailTache.pourcentageAvancement.toDouble(),
-                          onChanged: (newValue){
-                            final nouveauPourcentage = newValue.round();
-                            setState(() {
-                              detailTache = ReponseDetailTache(
-                                id: detailTache.id,
-                                nom: detailTache.nom,
-                                pourcentageAvancement: nouveauPourcentage,
-                                pourcentageTemps: detailTache.pourcentageTemps,
-                                dateLimite: detailTache.dateLimite,
-                                changements: detailTache.changements,
-                              );
-                            });
-                          },
-                          onChangeEnd: (newValue) async {
-                            await mettreAJourAvancement(detailTache.id, detailTache.pourcentageAvancement);
-                          },
-                          divisions: 100,
-                          label: "${detailTache.pourcentageAvancement}%",
-                          min: 0,
-                          max: 100,
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Pourcentage de temps écoulé :",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
+                            style: const TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Changer progression : ",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: Slider(
+                            value: detailTache.pourcentageAvancement.toDouble(),
+                            onChanged: (newValue){
+                              final nouveauPourcentage = newValue.round();
+                              setState(() {
+                                detailTache = ReponseDetailTache(
+                                  id: detailTache.id,
+                                  nom: detailTache.nom,
+                                  pourcentageAvancement: nouveauPourcentage,
+                                  pourcentageTemps: detailTache.pourcentageTemps,
+                                  dateLimite: detailTache.dateLimite,
+                                  changements: detailTache.changements,
+                                );
+                              });
+                            },
+                            onChangeEnd: (newValue) async {
+                              await mettreAJourAvancement(detailTache.id, detailTache.pourcentageAvancement);
+                            },
+                            divisions: 100,
+                            label: "${detailTache.pourcentageAvancement}%",
+                            min: 0,
+                            max: 100,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Ajouter image : ",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: ElevatedButton(
+                              onPressed: () => selectionnerImage(),
+                              child: const Text("Choisir une image")
+                          )
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: imagePath == null
+                              ? const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.white70,
+                            size: 80,
+                            )
+                              : Image.network(
+                            imagePath!,
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
