@@ -6,6 +6,7 @@ import 'package:frontendtp/class/reponseDetailTache.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'accueuil.dart';
+import 'class/reponseDetailTacheAvecPhoto.dart';
 import 'class/tache.dart';
 import 'creation.dart';
 import 'inscription.dart';
@@ -24,7 +25,8 @@ class _ConsultationState extends State<Consultation> {
   int _selectedIndex = 0;
   final ImagePicker picker = ImagePicker();
   late ReponseDetailTache detailTache;
-  String? imagePath = "";
+  String? imagePath;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -38,7 +40,7 @@ class _ConsultationState extends State<Consultation> {
       dateLimite: DateTime.now(),
       changements: [],
     );
-    requeteChargerDetail();
+    chargerDetailTache();
   }
 
   void _onItemTapped(int index) {
@@ -61,30 +63,62 @@ class _ConsultationState extends State<Consultation> {
     return (dureeEcoulee / dureeTotale) * 100;
   }
 
-  Future<void> requeteChargerDetail() async {
-    try {
-      var reponse = await SingletonDio.getDio().get(
-        "http://10.0.2.2:8080/tache/detail/${widget.tache.id}",
-      );
-      setState(() {
-        detailTache = ReponseDetailTache.fromJson(reponse.data);
-      });
-    } catch (e) {
-      print("Erreur chargement détail: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erreur de chargement du détail")),
-      );
-    }
-  }
-
   Future<void> mettreAJourAvancement(int idTache, int valeur) async {
     try {
       await SingletonDio.getDio().get(
         "http://10.0.2.2:8080/tache/progres/$idTache/$valeur",
       );
-      await requeteChargerDetail();
+      await chargerDetailTache();
     } catch (e) {
       print("Erreur lors de la mise à jour de l'avancement : $e");
+    }
+  }
+
+  Future<void> chargerDetailTache() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      Response response = await SingletonDio.getDio().get(
+        "http://10.0.2.2:8080/api/detail/photo/${widget.tache.id}",
+      );
+
+      if (response.statusCode == 200) {
+        print("Réponse serveur: ${response.data}");
+        final detail = ReponseDetailTacheAvecPhoto.fromJson(response.data);
+        print("Photo ID reçu: ${detail.photoId}");
+
+        setState(() {
+          detailTache = ReponseDetailTache(
+            id: detail.id,
+            nom: detail.nom,
+            pourcentageAvancement: detail.pourcentageAvancement,
+            pourcentageTemps: detail.pourcentageTemps,
+            dateLimite: detail.dateLimite,
+            changements: detail.changements,
+          );
+
+          if (detail.photoId != null) {
+            imagePath = "http://10.0.2.2:8080/fichier/${detail.photoId}?largeur=1080";
+            print("Image path: $imagePath");
+          } else {
+            imagePath = null;
+            print("Pas de photo pour cette tâche");
+          }
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Erreur lors du chargement du détail de la tâche : $e");
+      setState(() {
+        isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Erreur de chargement du détail")),
+        );
+      }
     }
   }
 
@@ -104,6 +138,7 @@ class _ConsultationState extends State<Consultation> {
           "http://10.0.2.2:8080/fichier",
           data: formData
       );
+
       if(response.statusCode == 200){
         String id = response.data.toString();
         String imageUrl = "http://10.0.2.2:8080/fichier/$id?largeur=1080";
@@ -111,6 +146,8 @@ class _ConsultationState extends State<Consultation> {
         setState(() {
           imagePath = imageUrl;
         });
+
+        await chargerDetailTache();
       }
     }
     catch(e){
@@ -126,11 +163,12 @@ class _ConsultationState extends State<Consultation> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 100),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -148,179 +186,272 @@ class _ConsultationState extends State<Consultation> {
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      detailTache.nom,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        detailTache.nom,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
+                      const SizedBox(height: 50),
 
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Avancement :",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                      Row(
+                        children: [
+                          const Expanded(
+                            flex: 2,
+                            child: Text(
+                              "Avancement :",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            "${detailTache.pourcentageAvancement}%",
-                            style: const TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Date limite :",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              "${detailTache.pourcentageAvancement}%",
+                              style: const TextStyle(fontSize: 18, color: Colors.white),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            detailTache.dateLimite.toString().split(' ')[0],
-                            style: const TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
 
-                    const SizedBox(height: 20),
-
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Pourcentage de temps écoulé :",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                      Row(
+                        children: [
+                          const Expanded(
+                            flex: 2,
+                            child: Text(
+                              "Date limite :",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
-                            style: const TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Changer progression : ",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              detailTache.dateLimite.toString().split(' ')[0],
+                              style: const TextStyle(fontSize: 18, color: Colors.white),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: Slider(
-                            value: detailTache.pourcentageAvancement.toDouble(),
-                            onChanged: (newValue){
-                              final nouveauPourcentage = newValue.round();
-                              setState(() {
-                                detailTache = ReponseDetailTache(
-                                  id: detailTache.id,
-                                  nom: detailTache.nom,
-                                  pourcentageAvancement: nouveauPourcentage,
-                                  pourcentageTemps: detailTache.pourcentageTemps,
-                                  dateLimite: detailTache.dateLimite,
-                                  changements: detailTache.changements,
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          const Expanded(
+                            flex: 2,
+                            child: Text(
+                              "Pourcentage de temps écoulé :",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
+                              style: const TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          const Expanded(
+                            flex: 2,
+                            child: Text(
+                              "Changer progression : ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Slider(
+                              value: detailTache.pourcentageAvancement.toDouble(),
+                              onChanged: (newValue) {
+                                final nouveauPourcentage = newValue.round();
+                                setState(() {
+                                  detailTache = ReponseDetailTache(
+                                    id: detailTache.id,
+                                    nom: detailTache.nom,
+                                    pourcentageAvancement: nouveauPourcentage,
+                                    pourcentageTemps: detailTache.pourcentageTemps,
+                                    dateLimite: detailTache.dateLimite,
+                                    changements: detailTache.changements,
+                                  );
+                                });
+                              },
+                              onChangeEnd: (newValue) async {
+                                await mettreAJourAvancement(
+                                    detailTache.id,
+                                    detailTache.pourcentageAvancement
                                 );
-                              });
-                            },
-                            onChangeEnd: (newValue) async {
-                              await mettreAJourAvancement(detailTache.id, detailTache.pourcentageAvancement);
-                            },
-                            divisions: 100,
-                            label: "${detailTache.pourcentageAvancement}%",
-                            min: 0,
-                            max: 100,
+                              },
+                              divisions: 100,
+                              label: "${detailTache.pourcentageAvancement}%",
+                              min: 0,
+                              max: 100,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Ajouter image : ",
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          const Expanded(
+                            flex: 2,
+                            child: Text(
+                              "Ajouter image : ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: ElevatedButton(
+                                onPressed: () => selectionnerImage(),
+                                child: const Text("Choisir une image")
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Image de la tâche :",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white70,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: ElevatedButton(
-                              onPressed: () => selectionnerImage(),
-                              child: const Text("Choisir une image")
-                          )
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: imagePath == null
-                              ? const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.white70,
-                            size: 80,
+                          const SizedBox(height: 10),
+                          if (isLoading)
+                            Container(
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[800],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             )
-                              : Image.network(
-                            imagePath!,
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                        )
-                      ],
-                    ),
-                  ],
+                          else if (imagePath != null && imagePath!.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                imagePath!,
+                                height: 250,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[800],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  print("Erreur chargement image: $error");
+                                  return Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[800],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: Colors.white70,
+                                            size: 80,
+                                          ),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            "Erreur de chargement",
+                                            style: TextStyle(color: Colors.white70),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          else
+                            Container(
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[800],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.white70,
+                                      size: 80,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      "Aucune image",
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
