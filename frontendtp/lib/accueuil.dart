@@ -17,7 +17,8 @@ import 'class/reponseAccueilItem.dart';
 import 'inscription.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int? photoId;
+  const HomePage({super.key, this.photoId});
 
   final String title = "Connection";
 
@@ -106,6 +107,7 @@ class _HomePageState extends State<HomePage> {
           final item = itemsAvecPhoto[index];
           return CarteListe(
             tache: item,
+            photoId: item.photoId,
             onTap: () {
               Navigator.of(context).push(
                   MaterialPageRoute(

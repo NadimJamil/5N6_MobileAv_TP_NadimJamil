@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/class/reponseAccueilItem.dart';
 import 'package:frontendtp/class/reponseDetailTacheAvecPhoto.dart';
@@ -7,9 +8,10 @@ import '../class/tache.dart';
 
 class CarteListe extends StatelessWidget {
   final ReponseAccueilItemAvecPhoto tache;
+  final int? photoId;
   final VoidCallback? onTap;
 
-  const CarteListe({super.key, required this.tache, this.onTap});
+  const CarteListe({super.key, required this.tache, this.photoId, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -104,32 +106,31 @@ class CarteListe extends StatelessWidget {
                   height: 100,
                   color: Colors.white24,
                   child: imageUrl != null
-                      ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            print("Error loading image: $error");
-                            return const Icon(
-                              Icons.broken_image,
-                              size: 40,
-                              color: Colors.white54,
-                            );
-                          },
-                        )
+                      ? CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) {
+                      print("Error loading image: $error");
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: Colors.white54,
+                      );
+                    },
+                  )
                       : const Icon(
-                          Icons.image,
-                          size: 40,
-                          color: Colors.white54,
-                        ),
+                    Icons.image,
+                    size: 40,
+                    color: Colors.white54,
+                  ),
                 ),
               ),
             ],

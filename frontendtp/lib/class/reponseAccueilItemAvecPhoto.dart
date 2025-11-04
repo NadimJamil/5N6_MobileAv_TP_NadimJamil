@@ -26,7 +26,7 @@ class ReponseAccueilItemAvecPhoto extends ReponseAccueilItem {
       pourcentageAvancement: (json['pourcentageAvancement'] ?? 0) as int,
       pourcentageTemps: (json['pourcentageTemps'] ?? 0) as int,
       dateLimite: DateTime.parse(json['dateLimite'] as String),
-      photoId: json['photoId'] != null ? (json['photoId'] as int) : null,
+      photoId: json['idPhoto'] != null ? (json['idPhoto'] as int) : null,
     );
   }
 }
