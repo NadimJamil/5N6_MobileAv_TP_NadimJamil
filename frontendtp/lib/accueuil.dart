@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
+import 'package:frontendtp/class/reponseAccueilItemAvecPhoto.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
+import 'package:frontendtp/class/reponseDetailTacheAvecPhoto.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
@@ -25,7 +27,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  List<ReponseAccueilItem> listeTache = [];
+  List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
+  bool isLoadingAccueil = true;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -36,14 +39,29 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    requeteListeTache();
+    chargerAccueilAvecPhoto();
   }
 
   void navCreation() async {
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (context) => const creation()));
-    requeteListeTache();
+    chargerAccueilAvecPhoto();
+  }
+
+  Future<void> chargerAccueilAvecPhoto() async {
+    try {
+      setState(() => isLoadingAccueil = true);
+      Response response = await SingletonDio.getDio().get("http://10.0.2.2:8080/api/accueil/photo");
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List<dynamic>;
+        itemsAvecPhoto = data.map((e) => ReponseAccueilItemAvecPhoto.fromJson(e as Map<String, dynamic>)).toList();
+      }
+    } catch (e) {
+      print("Erreur chargement accueil avec photo: $e");
+    } finally {
+      setState(() => isLoadingAccueil = false);
+    }
   }
 
   Future<void> deconnexion(BuildContext context) async {
@@ -64,28 +82,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void requeteListeTache() async {
-    try {
-      var reponse = await SingletonDio.getDio().get(
-        "http://10.0.2.2:8080/tache/accueil",
-      );
-      List<dynamic> jsonList = reponse.data;
-      if (jsonList != null) {
-        print("Liste des tâches reçue : $jsonList");
-        this.listeTache = jsonList
-            .map((json) => ReponseAccueilItem.fromJson(json))
-            .toList();
-      }
-
-      setState(() {});
-    } catch (e) {
-      print("Erreur de chargement: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erreur d'affichage de liste")),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,31 +90,38 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Accueil"),
       ),
-      body: Center(
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          itemCount: listeTache.length,
-          itemBuilder: (context, index) {
-            final selectedTache = listeTache[index];
-            return CarteListe(
-              tache: selectedTache,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => Consultation(tache: selectedTache),
-                  ),
-                );
-              },
-            );
-          },
+      body: isLoadingAccueil
+          ? const Center(child: CircularProgressIndicator())
+          : itemsAvecPhoto.isEmpty
+          ? const Center(
+        child: Text(
+          "Aucune tâche disponible",
+          style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
+      )
+          : ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        itemCount: itemsAvecPhoto.length,
+        itemBuilder: (context, index) {
+          final item = itemsAvecPhoto[index];
+          return CarteListe(
+            tache: item,
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (_) => Consultation(tache: item)
+                  )
+              );
+            },
+          );
+        },
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Text(
                 SessionUtilisateur().nomUtilisateur ?? 'Utilisateur',
                 style: const TextStyle(
@@ -135,7 +138,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 _onItemTapped(0);
                 Navigator.pop(context);
-                requeteListeTache();
+                chargerAccueilAvecPhoto();
               },
             ),
             ListTile(
@@ -153,20 +156,13 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 _onItemTapped(2);
                 deconnexion(context);
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => const SignUpPage(),
-                  ),
-                );
               },
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          navCreation();
-        },
+        onPressed: navCreation,
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
