@@ -19,6 +19,7 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -54,6 +55,9 @@ class _SignUpPageState extends State<SignUpPage> {
   void reqInscription() async {
 
     try {
+      setState(() {
+        isLoading = true;
+      });
       var req = RequeteInscription(
         nom: _usernameController.text.trim(),
         motDePasse: _passwordController.text.trim(),
@@ -68,6 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
       var rep = ReponseConnexion.fromJson(reponse.data);
       print("Inscription réussie : ${rep.nomUtilisateur}");
       navPageAccueuil();
+      isLoading = false;
     } catch (e) {
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,7 +89,9 @@ class _SignUpPageState extends State<SignUpPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text("Inscription"),
       ),
-      body: Center(
+      body : isLoading
+          ? const Center(child: CircularProgressIndicator()):
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[

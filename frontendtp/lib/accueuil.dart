@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = true;
+  bool isLoadingDeconnexion = false;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -66,20 +67,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> deconnexion(BuildContext context) async {
+    if(isLoadingDeconnexion) return;
+
     try {
+      setState(() {
+        isLoadingDeconnexion = true;
+      });
+
       final response = await SingletonDio.getDio().post(
         'http://10.0.2.2:8080/id/deconnexion',
       );
+
       if (response.statusCode == 200) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const SignUpPage()),
           (route) => false,
         );
       } else {
-        print("Erreur lors de la déconnexion : ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erreur lors de la déconnexion'),
+              backgroundColor: Colors.red,
+            ),
+        );
       }
     } catch (e) {
-      print("Erreur de connexion au serveur : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur de connexion : $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    finally {
+      if (mounted) {
+        setState(() {
+          isLoadingDeconnexion = false;
+        });
+      }
     }
   }
 
@@ -159,6 +184,15 @@ class _HomePageState extends State<HomePage> {
                 _onItemTapped(2);
                 deconnexion(context);
               },
+              trailing: isLoadingDeconnexion
+                  ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              )
+                  : null,
             ),
           ],
         ),

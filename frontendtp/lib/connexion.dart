@@ -20,6 +20,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -47,6 +48,9 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text.trim();
 
     try {
+      setState(() {
+        isLoading = true;
+      });
       var req = RequeteConnexion(
         nom: email,
         motDePasse: password,
@@ -59,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
       print("Connexion réussie : ${rep.nomUtilisateur}");
       SessionUtilisateur().nomUtilisateur = rep.nomUtilisateur;
       navPageAccueuil();
+      isLoading = false;
     }
     catch (e) {
       print("Erreur inscription: $e");
@@ -79,7 +84,9 @@ class _LoginPageState extends State<LoginPage> {
             .inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator()):
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[

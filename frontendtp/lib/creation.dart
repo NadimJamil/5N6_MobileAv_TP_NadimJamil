@@ -17,6 +17,7 @@ class _creationState extends State<creation> {
   int _selectedIndex = 0;
   final TextEditingController _nomTacheController = TextEditingController();
   DateTime? _dateLimite;
+  bool isLoadingCreation = false;
 
   @override
   void dispose() {
@@ -46,6 +47,7 @@ class _creationState extends State<creation> {
   }
 
   Future<void> creerTache() async {
+    if (isLoadingCreation) return;
 
     if (_dateLimite == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,19 +68,33 @@ class _creationState extends State<creation> {
       return;
     }
 
-    var req = RequeteAjoutTache(
-      _nomTacheController.text,
-      _dateLimite!,
-    );
+    var req = RequeteAjoutTache(_nomTacheController.text, _dateLimite!);
 
     try {
+      setState(() {
+        isLoadingCreation = true;
+      });
+
       var reponse = await SingletonDio.getDio().post(
         'http://10.0.2.2:8080/tache/ajout',
-        data: req.toJson()
+        data: req.toJson(),
       );
       Navigator.of(context).pop();
-    }  catch (e) {
-      print("Erreur de création : ");
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la création : $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadingCreation = false;
+        });
+      }
     }
   }
 
@@ -165,7 +181,10 @@ class _creationState extends State<creation> {
                 onTap: _pickDate,
                 child: Container(
                   width: 350,
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blueAccent.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(12),
@@ -193,11 +212,14 @@ class _creationState extends State<creation> {
               ),
               const SizedBox(height: 50),
               ElevatedButton(
-                onPressed: creerTache,
+                onPressed: isLoadingCreation ? null : creerTache,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.greenAccent.shade700,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 64,
+                    vertical: 16,
+                  ),
                   textStyle: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -207,7 +229,18 @@ class _creationState extends State<creation> {
                   ),
                   elevation: 6,
                 ),
-                child: const Text("Ajouter la tâche"),
+                child: isLoadingCreation
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text("Ajouter la tâche"),
               ),
             ],
           ),
@@ -215,5 +248,4 @@ class _creationState extends State<creation> {
       ),
     );
   }
-
 }
