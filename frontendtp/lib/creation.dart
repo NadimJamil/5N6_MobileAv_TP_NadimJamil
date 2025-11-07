@@ -4,6 +4,7 @@ import 'package:frontendtp/accueuil.dart';
 import 'package:intl/intl.dart';
 
 import 'class/transfert.dart';
+import 'generated/l10n.dart';
 import 'inscription.dart';
 
 class creation extends StatefulWidget {
@@ -49,10 +50,12 @@ class _creationState extends State<creation> {
   Future<void> creerTache() async {
     if (isLoadingCreation) return;
 
+    final l10n = S.of(context)!;
+
     if (_dateLimite == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez sélectionner une date limite.'),
+        SnackBar(
+          content: Text(l10n.selectDeadlineError),
           backgroundColor: Colors.red,
         ),
       );
@@ -60,8 +63,8 @@ class _creationState extends State<creation> {
     }
     if (_nomTacheController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez entrer un nom pour la tâche.'),
+        SnackBar(
+          content: Text(l10n.enterTaskNameError),
           backgroundColor: Colors.red,
         ),
       );
@@ -82,9 +85,10 @@ class _creationState extends State<creation> {
       Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
+        final l10n = S.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de la création : $e'),
+            content: Text(l10n.creationError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -100,21 +104,23 @@ class _creationState extends State<creation> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Création de tâche"),
+        title: Text(l10n.creationTitle),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Text(
-                'Menu',
-                style: TextStyle(
+                l10n.menu,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -123,7 +129,7 @@ class _creationState extends State<creation> {
               ),
             ),
             ListTile(
-              title: const Text('Accueil'),
+              title: Text(l10n.home),
               selected: _selectedIndex == 0,
               onTap: () {
                 _onItemTapped(0);
@@ -135,7 +141,7 @@ class _creationState extends State<creation> {
               },
             ),
             ListTile(
-              title: const Text('Création de tâche'),
+              title: Text(l10n.taskCreation),
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
@@ -143,7 +149,7 @@ class _creationState extends State<creation> {
               },
             ),
             ListTile(
-              title: const Text('Déconnexion'),
+              title: Text(l10n.logout),
               selected: _selectedIndex == 2,
               onTap: () {
                 _onItemTapped(2);
@@ -167,10 +173,10 @@ class _creationState extends State<creation> {
                 child: TextField(
                   controller: _nomTacheController,
                   textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    labelText: "Nom de la tâche",
-                    labelStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
+                  decoration: InputDecoration(
+                    labelText: l10n.taskNameLabel,
+                    labelStyle: const TextStyle(color: Colors.white),
+                    enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white, width: 1),
                     ),
                   ),
@@ -199,8 +205,8 @@ class _creationState extends State<creation> {
                   child: Center(
                     child: Text(
                       _dateLimite == null
-                          ? "Choisir une date limite"
-                          : "Date limite : ${DateFormat('yyyy-MM-dd').format(_dateLimite!)}",
+                          ? l10n.chooseDeadline
+                          : l10n.deadlineSelected(DateFormat('yyyy-MM-dd').format(_dateLimite!)),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -231,16 +237,16 @@ class _creationState extends State<creation> {
                 ),
                 child: isLoadingCreation
                     ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text("Ajouter la tâche"),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white,
+                    ),
+                    strokeWidth: 2,
+                  ),
+                )
+                    : Text(l10n.addTask),
               ),
             ],
           ),

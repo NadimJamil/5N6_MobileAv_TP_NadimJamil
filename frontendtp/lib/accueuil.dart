@@ -14,6 +14,7 @@ import 'package:frontendtp/creation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'class/tache.dart';
 import 'class/reponseAccueilItem.dart';
+import 'generated/l10n.dart';
 import 'inscription.dart';
 
 class HomePage extends StatefulWidget {
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {;
+    if (state == AppLifecycleState.resumed) {
       chargerAccueilAvecPhoto();
     }
   }
@@ -96,20 +97,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
       if (response.statusCode == 200) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const SignUpPage()),
-          (route) => false,
+              (route) => false,
         );
       } else {
+        final l10n = S.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erreur lors de la déconnexion'),
-              backgroundColor: Colors.red,
-            ),
+          SnackBar(
+            content: Text(l10n.logoutError),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
+      final l10n = S.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur de connexion : $e'),
+          content: Text(l10n.connectionErrorWithDetails(e.toString())),
           backgroundColor: Colors.red,
         ),
       );
@@ -125,19 +128,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Accueil"),
+        title: Text(l10n.homeTitle),
       ),
       body: isLoadingAccueil
           ? const Center(child: CircularProgressIndicator())
           : itemsAvecPhoto.isEmpty
-          ? const Center(
+          ? Center(
         child: Text(
-          "Aucune tâche disponible",
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+          l10n.noTasksAvailable,
+          style: const TextStyle(fontSize: 18, color: Colors.grey),
         ),
       )
           : ListView.builder(
@@ -165,7 +170,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
             DrawerHeader(
               decoration: const BoxDecoration(color: Colors.blue),
               child: Text(
-                SessionUtilisateur().nomUtilisateur ?? 'Utilisateur',
+                SessionUtilisateur().nomUtilisateur ?? l10n.user,
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -175,7 +180,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               ),
             ),
             ListTile(
-              title: const Text('Accueil'),
+              title: Text(l10n.home),
               selected: _selectedIndex == 0,
               onTap: () {
                 _onItemTapped(0);
@@ -184,7 +189,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               },
             ),
             ListTile(
-              title: const Text('Création de tâche'),
+              title: Text(l10n.taskCreation),
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
@@ -193,7 +198,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               },
             ),
             ListTile(
-              title: const Text('Déconnexion'),
+              title: Text(l10n.logout),
               selected: _selectedIndex == 2,
               onTap: () {
                 _onItemTapped(2);

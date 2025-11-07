@@ -1,0 +1,221 @@
+{
+  "appTitle": "Application Todo",
+  "signUp": "Inscription",
+  "usernameHint": "Entrez votre nom d'utilisateur",
+  "passwordHint": "Entrez votre mot de passe",
+  "confirmPasswordHint": "Confirmez votre mot de passe",
+  "continueBtn": "Continuer",
+  "haveAccount": "Vous avez déjà un compte ?",
+  "login": "Se connecter",
+  "signupFailed": "Échec de l'inscription",
+
+  "connectionTitle": "Connexion",
+  "usernameLabel": "Nom d'utilisateur",
+  "passwordLabel": "Mot de passe",
+  "loginBtn": "Se connecter",
+  "noAccount": "Vous n'avez pas de compte?",
+  "signUpLink": "S'inscrire",
+  "loginFailed": "Échec de la connexion",
+  "connectionError": "Erreur de connexion : {error}",
+  "invalidCredentials": "Nom d'utilisateur ou mot de passe incorrect",
+  "serverError": "Erreur serveur, veuillez réessayer",
+
+  "consultationTitle": "Consultation",
+  "progress": "Avancement :",
+  "deadline": "Date limite :",
+  "timeElapsedPercentage": "Pourcentage de temps écoulé :",
+  "changeProgress": "Changer progression : ",
+  "addImage": "Ajouter image : ",
+  "chooseImage": "Choisir une image",
+  "taskImage": "Image de la tâche :",
+  "noImage": "Aucune image",
+  "loadingError": "Erreur de chargement",
+  "updateError": "Erreur lors de la mise à jour",
+  "detailLoadError": "Erreur de chargement du détail",
+  "menu": "Menu",
+  "home": "Accueil",
+  "taskCreation": "Création de tâche",
+  "logout": "Déconnexion",
+
+  "homeTitle": "Accueil",
+  "noTasksAvailable": "Aucune tâche disponible",
+  "logoutError": "Erreur lors de la déconnexion",
+  "connectionErrorWithDetails": "Erreur de connexion : {error}",
+  "user": "Utilisateur",
+
+  "creationTitle": "Création de tâche",
+  "taskNameLabel": "Nom de la tâche",
+  "chooseDeadline": "Choisir une date limite",
+  "deadlineSelected": "Date limite : {date}",
+  "addTask": "Ajouter la tâche",
+  "selectDeadlineError": "Veuillez sélectionner une date limite.",
+  "enterTaskNameError": "Veuillez entrer un nom pour la tâche.",
+  "creationError": "Erreur lors de la création : {error}",
+
+  "progressLabel": "Avancement",
+  "timeElapsedLabel": "Temps écoulé",
+  "deadlineLabel": "Date Limite: {date}",
+
+  "@appTitle": {
+    "description": "Titre de l'application"
+  },
+  "@signupFailed": {
+    "description": "Message affiché quand l'inscription échoue"
+  },
+  "@connectionTitle": {
+    "description": "Titre de la page de connexion"
+  },
+  "@usernameLabel": {
+    "description": "Label pour le champ nom d'utilisateur"
+  },
+  "@passwordLabel": {
+    "description": "Label pour le champ mot de passe"
+  },
+  "@loginBtn": {
+    "description": "Texte du bouton de connexion"
+  },
+  "@noAccount": {
+    "description": "Message pour les utilisateurs sans compte"
+  },
+  "@signUpLink": {
+    "description": "Lien vers la page d'inscription"
+  },
+  "@loginFailed": {
+    "description": "Message affiché quand la connexion échoue"
+  },
+  "@connectionError": {
+    "description": "Message d'erreur de connexion avec détails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@invalidCredentials": {
+    "description": "Message pour identifiants invalides"
+  },
+  "@serverError": {
+    "description": "Message d'erreur serveur"
+  },
+  "@consultationTitle": {
+    "description": "Titre de la page de consultation"
+  },
+  "@progress": {
+    "description": "Label pour l'avancement de la tâche"
+  },
+  "@deadline": {
+    "description": "Label pour la date limite"
+  },
+  "@timeElapsedPercentage": {
+    "description": "Label pour le pourcentage de temps écoulé"
+  },
+  "@changeProgress": {
+    "description": "Label pour modifier la progression"
+  },
+  "@addImage": {
+    "description": "Label pour ajouter une image"
+  },
+  "@chooseImage": {
+    "description": "Texte du bouton pour choisir une image"
+  },
+  "@taskImage": {
+    "description": "Label pour l'image de la tâche"
+  },
+  "@noImage": {
+    "description": "Message quand aucune image n'est disponible"
+  },
+  "@loadingError": {
+    "description": "Message d'erreur de chargement d'image"
+  },
+  "@updateError": {
+    "description": "Message d'erreur lors de la mise à jour"
+  },
+  "@detailLoadError": {
+    "description": "Message d'erreur de chargement du détail"
+  },
+  "@menu": {
+    "description": "Titre du menu drawer"
+  },
+  "@home": {
+    "description": "Option menu accueil"
+  },
+  "@taskCreation": {
+    "description": "Option menu création de tâche"
+  },
+  "@logout": {
+    "description": "Option menu déconnexion"
+  },
+  "@homeTitle": {
+    "description": "Titre de la page d'accueil"
+  },
+  "@noTasksAvailable": {
+    "description": "Message quand aucune tâche n'est disponible"
+  },
+  "@logoutError": {
+    "description": "Message d'erreur lors de la déconnexion"
+  },
+  "@connectionErrorWithDetails": {
+    "description": "Message d'erreur de connexion avec détails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@user": {
+    "description": "Label utilisateur par défaut"
+  },
+  "@creationTitle": {
+    "description": "Titre de la page de création"
+  },
+  "@taskNameLabel": {
+    "description": "Label pour le nom de la tâche"
+  },
+  "@chooseDeadline": {
+    "description": "Texte pour choisir une date limite"
+  },
+  "@deadlineSelected": {
+    "description": "Texte quand une date limite est sélectionnée",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "2025-12-31"
+      }
+    }
+  },
+  "@addTask": {
+    "description": "Texte du bouton ajouter tâche"
+  },
+  "@selectDeadlineError": {
+    "description": "Message d'erreur si aucune date n'est sélectionnée"
+  },
+  "@enterTaskNameError": {
+    "description": "Message d'erreur si aucun nom n'est entré"
+  },
+  "@creationError": {
+    "description": "Message d'erreur lors de la création",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@progressLabel": {
+    "description": "Label pour l'avancement dans la carte"
+  },
+  "@timeElapsedLabel": {
+    "description": "Label pour le temps écoulé dans la carte"
+  },
+  "@deadlineLabel": {
+    "description": "Label pour la deadline dans la carte",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "2025-12-31"
+      }
+    }
+  }
+}

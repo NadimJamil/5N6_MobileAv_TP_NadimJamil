@@ -7,6 +7,7 @@ import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
 import 'class/requeteInscription.dart';
+import 'generated/l10n.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -75,7 +76,7 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Échec de l'inscription")),
+        SnackBar(content: Text(S.of(context).signupFailed)),
       );
     }
   }
@@ -126,8 +127,8 @@ class _SignUpPageState extends State<SignUpPage> {
               child: TextField(
                 textAlign: TextAlign.center,
                 controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Entrez votre nom d'utilisateur",
+                decoration: InputDecoration(
+                  labelText: S.of(context).usernameHint,
                   labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white, width: 1),
@@ -143,8 +144,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 obscuringCharacter: '•',
                 textAlign: TextAlign.center,
                 controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: "Entrez votre mot de passe",
+                decoration: InputDecoration(
+                  labelText: S.of(context).passwordHint,
                   labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white, width: 1),
@@ -160,8 +161,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 obscuringCharacter: '•',
                 textAlign: TextAlign.center,
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: "Confirmez votre mot de passe",
+                decoration: InputDecoration(
+                  labelText: S.of(context).confirmPasswordHint,
                   labelStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white, width: 1),
@@ -184,18 +185,18 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 elevation: 5,
               ),
-              child: const Text("Continuer"),
+              child: Text(S.of(context).continueBtn),
             ),
             const SizedBox(height: 32),
-            const Text(
-              "Vous avez déjà un compte?",
+            Text(
+              S.of(context).haveAccount,
               style: TextStyle(color: Colors.white),
             ),
             TextButton(
               onPressed: navPageConnection,
               style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
-              child: const Text(
-                "Se connecter",
+              child: Text(
+                S.of(context).login,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
@@ -229,8 +230,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: TextField(
                       textAlign: TextAlign.center,
                       controller: _usernameController,
-                      decoration: const InputDecoration(
-                        labelText: "Entrez votre nom d'utilisateur",
+                      decoration: InputDecoration(
+                        labelText: S.of(context).usernameHint,
                         labelStyle: TextStyle(color: Colors.white),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white, width: 1),
@@ -246,8 +247,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscuringCharacter: '•',
                       textAlign: TextAlign.center,
                       controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: "Entrez votre mot de passe",
+                      decoration: InputDecoration(
+                        labelText: S.of(context).passwordHint,
                         labelStyle: TextStyle(color: Colors.white),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white, width: 1),
@@ -263,8 +264,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscuringCharacter: '•',
                       textAlign: TextAlign.center,
                       controller: _confirmPasswordController,
-                      decoration: const InputDecoration(
-                        labelText: "Confirmez votre mot de passe",
+                      decoration: InputDecoration(
+                        labelText: S.of(context).confirmPasswordHint,
                         labelStyle: TextStyle(color: Colors.white),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white, width: 1),
@@ -287,19 +288,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       elevation: 5,
                     ),
-                    child: const Text("Continuer"),
+                    child: Text(S.of(context).continueBtn),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Vous avez déjà un compte?",
+                  Text(
+                    S.of(context).haveAccount,
                     style: TextStyle(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: navPageConnection,
                     style: TextButton.styleFrom(
                         foregroundColor: Colors.blueAccent),
-                    child: const Text(
-                      "Se connecter",
+                    child: Text(
+                      S.of(context).login,
                       style:
                       TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),

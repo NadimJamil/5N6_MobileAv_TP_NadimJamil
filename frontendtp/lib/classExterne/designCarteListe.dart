@@ -5,6 +5,7 @@ import 'package:frontendtp/class/reponseDetailTacheAvecPhoto.dart';
 
 import '../class/reponseAccueilItemAvecPhoto.dart';
 import '../class/tache.dart';
+import '../generated/l10n.dart';
 
 class CarteListe extends StatelessWidget {
   final ReponseAccueilItemAvecPhoto tache;
@@ -15,6 +16,8 @@ class CarteListe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context)!;
+
     String? imageUrl;
     if (tache.photoId != null) {
       imageUrl = "http://10.0.2.2:8080/fichier/${tache.photoId}?largeur=200";
@@ -47,9 +50,9 @@ class CarteListe extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Avancement",
-                          style: TextStyle(color: Colors.white70),
+                        Text(
+                          l10n.progressLabel,
+                          style: const TextStyle(color: Colors.white70),
                         ),
                         Text(
                           "${tache.pourcentageAvancement}%",
@@ -69,9 +72,9 @@ class CarteListe extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Temps écoulé",
-                          style: TextStyle(color: Colors.white70),
+                        Text(
+                          l10n.timeElapsedLabel,
+                          style: const TextStyle(color: Colors.white70),
                         ),
                         Text(
                           "${tache.pourcentageTemps}%",
@@ -89,7 +92,7 @@ class CarteListe extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          "Deadline: ${tache.dateLimite.toString().split(' ')[0]}",
+                          l10n.deadlineLabel(tache.dateLimite.toString().split(' ')[0]),
                           style: const TextStyle(color: Colors.white),
                         ),
                       ],
@@ -118,7 +121,6 @@ class CarteListe extends StatelessWidget {
                       ),
                     ),
                     errorWidget: (context, url, error) {
-                      print("Error loading image: $error");
                       return const Icon(
                         Icons.broken_image,
                         size: 40,

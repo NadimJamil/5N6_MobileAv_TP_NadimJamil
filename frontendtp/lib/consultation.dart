@@ -8,8 +8,8 @@ import 'package:image_picker/image_picker.dart';
 
 import 'accueuil.dart';
 import 'class/reponseDetailTacheAvecPhoto.dart';
-import 'class/tache.dart';
 import 'creation.dart';
+import 'generated/l10n.dart';
 import 'inscription.dart';
 
 class Consultation extends StatefulWidget {
@@ -105,9 +105,10 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
       }
     } catch (e) {
       if (mounted) {
+        final l10n = S.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erreur lors de la mise à jour'),
+          SnackBar(
+            content: Text(l10n.updateError),
             backgroundColor: Colors.red,
           ),
         );
@@ -167,8 +168,9 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
         isLoading = false;
       });
       if (mounted) {
+        final l10n = S.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Erreur de chargement du détail")),
+          SnackBar(content: Text(l10n.detailLoadError)),
         );
       }
     }
@@ -200,342 +202,344 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
         });
       }
     } catch (e) {
-      print("Erreur lors de l’envoi de l’image : $e");
+      print("Erreur lors de l'envoi de l'image : $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(l10n.consultationTitle),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black, width: 1),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        detailTache.nom,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              detailTache.nom,
+                      const SizedBox(height: 50),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              l10n.progress,
                               style: const TextStyle(
-                                fontSize: 28,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              "${detailTache.pourcentageAvancement}%",
+                              style: const TextStyle(
+                                fontSize: 18,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 50),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
 
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Avancement :",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    "${detailTache.pourcentageAvancement}%",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              l10n.deadline,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
-                            const SizedBox(height: 20),
-
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Date limite :",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    detailTache.dateLimite.toString().split(
-                                      ' ',
-                                    )[0],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              detailTache.dateLimite.toString().split(
+                                ' ',
+                              )[0],
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
                             ),
+                          ),
+                        ],
+                      ),
 
-                            const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Pourcentage de temps écoulé :",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              l10n.timeElapsedPercentage,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
-                            const SizedBox(height: 20),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              "${calculerPourcentageTempsRestant().toStringAsFixed(1)}%",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
 
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Changer progression : ",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              l10n.changeProgress,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Slider(
+                              value: detailTache.pourcentageAvancement.toDouble(),
+                              onChanged: isLoadingProgress
+                                  ? null
+                                  : (newValue) {
+                                final nouveauPourcentage = newValue.round();
+                                setState(() {
+                                  detailTache = ReponseDetailTache(
+                                    id: detailTache.id,
+                                    nom: detailTache.nom,
+                                    pourcentageAvancement:
+                                    nouveauPourcentage,
+                                    pourcentageTemps: detailTache
+                                        .pourcentageTemps,
+                                    dateLimite:
+                                    detailTache.dateLimite,
+                                    changements:
+                                    detailTache.changements,
+                                  );
+                                });
+                              },
+                              onChangeEnd:  isLoadingProgress
+                                  ? null
+                                  : (newValue) async {
+                                await mettreAJourAvancement(
+                                  detailTache.id,
+                                  detailTache.pourcentageAvancement,
+                                );
+                              },
+                              divisions: 100,
+                              label:
+                              "${detailTache.pourcentageAvancement}%",
+                              min: 0,
+                              max: 100,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              l10n.addImage,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: ElevatedButton(
+                              onPressed: () => selectionnerImage(),
+                              child: Text(l10n.chooseImage),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.taskImage,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (isLoading)
+                            Container(
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[800],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          else if (imagePath != null &&
+                              imagePath!.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: imagePath!,
+                                height: 250,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  height: 250,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[800],
+                                    borderRadius: BorderRadius.circular(
+                                      8,
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Slider(
-                                    value: detailTache.pourcentageAvancement.toDouble(),
-                                    onChanged: isLoadingProgress
-                                        ? null
-                                        : (newValue) {
-                                            final nouveauPourcentage = newValue.round();
-                                            setState(() {
-                                              detailTache = ReponseDetailTache(
-                                                id: detailTache.id,
-                                                nom: detailTache.nom,
-                                                pourcentageAvancement:
-                                                    nouveauPourcentage,
-                                                pourcentageTemps: detailTache
-                                                    .pourcentageTemps,
-                                                dateLimite:
-                                                    detailTache.dateLimite,
-                                                changements:
-                                                    detailTache.changements,
-                                              );
-                                            });
-                                          },
-                                    onChangeEnd:  isLoadingProgress
-                                        ? null
-                                        : (newValue) async {
-                                      await mettreAJourAvancement(
-                                        detailTache.id,
-                                        detailTache.pourcentageAvancement,
-                                      );
-                                    },
-                                    divisions: 100,
-                                    label:
-                                        "${detailTache.pourcentageAvancement}%",
-                                    min: 0,
-                                    max: 100,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Ajouter image : ",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: ElevatedButton(
-                                    onPressed: () => selectionnerImage(),
-                                    child: const Text("Choisir une image"),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Image de la tâche :",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                if (isLoading)
-                                  Container(
+                                errorWidget: (context, url, error) {
+                                  return Container(
                                     height: 250,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  )
-                                else if (imagePath != null &&
-                                    imagePath!.isNotEmpty)
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: CachedNetworkImage(
-                                      imageUrl: imagePath!,
-                                      height: 250,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(
-                                        height: 250,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[800],
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
+                                      borderRadius: BorderRadius.circular(
+                                        8,
                                       ),
-                                      errorWidget: (context, url, error) {
-                                        return Container(
-                                          height: 250,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[800],
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: const Center(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.error_outline,
-                                                  color: Colors.white70,
-                                                  size: 80,
-                                                ),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  "Erreur de chargement",
-                                                  style: TextStyle(
-                                                    color: Colors.white70,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
                                     ),
-                                  )
-                                else
-                                  Container(
-                                    height: 250,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
+                                    child: Center(
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
-                                          Icon(
-                                            Icons.image_not_supported,
+                                          const Icon(
+                                            Icons.error_outline,
                                             color: Colors.white70,
                                             size: 80,
                                           ),
-                                          SizedBox(height: 10),
+                                          const SizedBox(height: 10),
                                           Text(
-                                            "Aucune image",
-                                            style: TextStyle(
+                                            l10n.loadingError,
+                                            style: const TextStyle(
                                               color: Colors.white70,
-                                              fontSize: 16,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                              ],
+                                  );
+                                },
+                              ),
+                            )
+                          else
+                            Container(
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[800],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.white70,
+                                      size: 80,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      l10n.noImage,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
+          ],
+        ),
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Text(
-                'Menu',
-                style: TextStyle(
+                l10n.menu,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -544,7 +548,7 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
               ),
             ),
             ListTile(
-              title: const Text('Accueil'),
+              title: Text(l10n.home),
               selected: _selectedIndex == 0,
               onTap: () {
                 _onItemTapped(0);
@@ -556,7 +560,7 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
               },
             ),
             ListTile(
-              title: const Text('Création de tâche'),
+              title: Text(l10n.taskCreation),
               selected: _selectedIndex == 1,
               onTap: () {
                 _onItemTapped(1);
@@ -568,7 +572,7 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
               },
             ),
             ListTile(
-              title: const Text('Déconnexion'),
+              title: Text(l10n.logout),
               selected: _selectedIndex == 2,
               onTap: () {
                 _onItemTapped(2);

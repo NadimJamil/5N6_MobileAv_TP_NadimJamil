@@ -8,6 +8,8 @@ import 'package:frontendtp/class/reponseConnexion.dart';
 import 'package:frontendtp/class/requeteConnexion.dart';
 import 'package:frontendtp/inscription.dart';
 
+import 'generated/l10n.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -68,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     catch (e) {
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Échec de l'inscription")),
+        SnackBar(content: Text(S.of(context).signupFailed)),
           );
           setState(() {
             isLoading = false;
@@ -76,16 +78,18 @@ class _LoginPageState extends State<LoginPage> {
       }
       }
 
-  Widget _buildPortraitLayout() {
+  Widget _buildPortraitLayout(BuildContext context) {
+    final l10n = S.of(context)!;
+
     return Center(
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 100),
-            const Text(
-              "Connexion",
-              style: TextStyle(
+            Text(
+              l10n.connectionTitle,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -97,10 +101,11 @@ class _LoginPageState extends State<LoginPage> {
               child: TextField(
                 textAlign: TextAlign.center,
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: "Nom d'utilisateur",
-                  labelStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
+                decoration: InputDecoration(
+                  labelText: l10n.usernameLabel,
+                  hintText: l10n.usernameHint,
+                  labelStyle: const TextStyle(color: Colors.white),
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                 ),
@@ -114,10 +119,11 @@ class _LoginPageState extends State<LoginPage> {
                 obscuringCharacter: '•',
                 textAlign: TextAlign.center,
                 controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: "Mot de passe",
-                  labelStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
+                decoration: InputDecoration(
+                  labelText: l10n.passwordLabel,
+                  hintText: l10n.passwordHint,
+                  labelStyle: const TextStyle(color: Colors.white),
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                 ),
@@ -129,8 +135,7 @@ class _LoginPageState extends State<LoginPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
-                padding:
-                const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
                 textStyle: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -140,19 +145,19 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 elevation: 5,
               ),
-              child: const Text("Se connecter"),
+              child: Text(l10n.loginBtn),
             ),
             const SizedBox(height: 32),
-            const Text(
-              "Vous n'avez pas de compte?",
-              style: TextStyle(color: Colors.white),
+            Text(
+              l10n.noAccount,
+              style: const TextStyle(color: Colors.white),
             ),
             TextButton(
               onPressed: navPageInscription,
               style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
-              child: const Text(
-                "S'inscrire",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              child: Text(
+                l10n.signUpLink,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ],
@@ -161,7 +166,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLandscapeLayout() {
+  Widget _buildLandscapeLayout(BuildContext context) {
+    final l10n = S.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -171,9 +178,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 40),
-                  const Text(
-                    "Connexion",
-                    style: TextStyle(
+                  Text(
+                    l10n.connectionTitle,
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -185,12 +192,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextField(
                       textAlign: TextAlign.center,
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: "Nom d'utilisateur",
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                          BorderSide(color: Colors.white, width: 1),
+                      decoration: InputDecoration(
+                        labelText: l10n.usernameLabel,
+                        hintText: l10n.usernameHint,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 1),
                         ),
                       ),
                     ),
@@ -203,12 +210,12 @@ class _LoginPageState extends State<LoginPage> {
                       obscuringCharacter: '•',
                       textAlign: TextAlign.center,
                       controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: "Mot de passe",
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                          BorderSide(color: Colors.white, width: 1),
+                      decoration: InputDecoration(
+                        labelText: l10n.passwordLabel,
+                        hintText: l10n.passwordHint,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 1),
                         ),
                       ),
                     ),
@@ -232,21 +239,21 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       elevation: 5,
                     ),
-                    child: const Text("Se connecter"),
+                    child: Text(l10n.loginBtn),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Vous n'avez pas de compte?",
-                    style: TextStyle(color: Colors.white),
+                  Text(
+                    l10n.noAccount,
+                    style: const TextStyle(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: navPageInscription,
                     style: TextButton.styleFrom(
                         foregroundColor: Colors.blueAccent),
-                    child: const Text(
-                      "S'inscrire",
-                      style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    child: Text(
+                      l10n.signUpLink,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                 ],
@@ -271,9 +278,9 @@ class _LoginPageState extends State<LoginPage> {
           : OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.landscape) {
-            return _buildLandscapeLayout();
+            return _buildLandscapeLayout(context);
           } else {
-            return _buildPortraitLayout();
+            return _buildPortraitLayout(context);
           }
         },
       ),

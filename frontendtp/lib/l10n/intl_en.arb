@@ -1,3 +1,221 @@
 {
+  "appTitle": "Todo Application",
+  "signUp": "Sign Up",
+  "usernameHint": "Enter your username",
+  "passwordHint": "Enter your password",
+  "confirmPasswordHint": "Confirm your password",
+  "continueBtn": "Continue",
+  "haveAccount": "Already have an account?",
+  "login": "Log In",
+  "signupFailed": "Sign up failed",
 
+  "connectionTitle": "Login",
+  "usernameLabel": "Username",
+  "passwordLabel": "Password",
+  "loginBtn": "Log In",
+  "noAccount": "Don't have an account?",
+  "signUpLink": "Sign Up",
+  "loginFailed": "Login failed",
+  "connectionError": "Connection error: {error}",
+  "invalidCredentials": "Invalid username or password",
+  "serverError": "Server error, please try again",
+
+  "consultationTitle": "Consultation",
+  "progress": "Progress:",
+  "deadline": "Deadline:",
+  "timeElapsedPercentage": "Time elapsed percentage:",
+  "changeProgress": "Change progress: ",
+  "addImage": "Add image: ",
+  "chooseImage": "Choose an image",
+  "taskImage": "Task image:",
+  "noImage": "No image",
+  "loadingError": "Loading error",
+  "updateError": "Update error",
+  "detailLoadError": "Detail loading error",
+  "menu": "Menu",
+  "home": "Home",
+  "taskCreation": "Task Creation",
+  "logout": "Logout",
+
+  "homeTitle": "Home",
+  "noTasksAvailable": "No tasks available",
+  "logoutError": "Error during logout",
+  "connectionErrorWithDetails": "Connection error: {error}",
+  "user": "User",
+
+  "creationTitle": "Task Creation",
+  "taskNameLabel": "Task name",
+  "chooseDeadline": "Choose a deadline",
+  "deadlineSelected": "Deadline: {date}",
+  "addTask": "Add task",
+  "selectDeadlineError": "Please select a deadline.",
+  "enterTaskNameError": "Please enter a task name.",
+  "creationError": "Creation error: {error}",
+
+  "progressLabel": "Progress",
+  "timeElapsedLabel": "Time elapsed",
+  "deadlineLabel": "Deadline: {date}",
+
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "@signupFailed": {
+    "description": "Message displayed when sign up fails"
+  },
+  "@connectionTitle": {
+    "description": "Login page title"
+  },
+  "@usernameLabel": {
+    "description": "Label for username field"
+  },
+  "@passwordLabel": {
+    "description": "Label for password field"
+  },
+  "@loginBtn": {
+    "description": "Login button text"
+  },
+  "@noAccount": {
+    "description": "Message for users without an account"
+  },
+  "@signUpLink": {
+    "description": "Link to sign up page"
+  },
+  "@loginFailed": {
+    "description": "Message displayed when login fails"
+  },
+  "@connectionError": {
+    "description": "Connection error message with details",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@invalidCredentials": {
+    "description": "Message for invalid credentials"
+  },
+  "@serverError": {
+    "description": "Server error message"
+  },
+  "@consultationTitle": {
+    "description": "Consultation page title"
+  },
+  "@progress": {
+    "description": "Label for task progress"
+  },
+  "@deadline": {
+    "description": "Label for deadline"
+  },
+  "@timeElapsedPercentage": {
+    "description": "Label for time elapsed percentage"
+  },
+  "@changeProgress": {
+    "description": "Label for changing progress"
+  },
+  "@addImage": {
+    "description": "Label for adding an image"
+  },
+  "@chooseImage": {
+    "description": "Button text for choosing an image"
+  },
+  "@taskImage": {
+    "description": "Label for task image"
+  },
+  "@noImage": {
+    "description": "Message when no image is available"
+  },
+  "@loadingError": {
+    "description": "Image loading error message"
+  },
+  "@updateError": {
+    "description": "Update error message"
+  },
+  "@detailLoadError": {
+    "description": "Detail loading error message"
+  },
+  "@menu": {
+    "description": "Drawer menu title"
+  },
+  "@home": {
+    "description": "Home menu option"
+  },
+  "@taskCreation": {
+    "description": "Task creation menu option"
+  },
+  "@logout": {
+    "description": "Logout menu option"
+  },
+  "@homeTitle": {
+    "description": "Home page title"
+  },
+  "@noTasksAvailable": {
+    "description": "Message when no tasks are available"
+  },
+  "@logoutError": {
+    "description": "Error message during logout"
+  },
+  "@connectionErrorWithDetails": {
+    "description": "Connection error message with details",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@user": {
+    "description": "Default user label"
+  },
+  "@creationTitle": {
+    "description": "Task creation page title"
+  },
+  "@taskNameLabel": {
+    "description": "Label for task name"
+  },
+  "@chooseDeadline": {
+    "description": "Text for choosing a deadline"
+  },
+  "@deadlineSelected": {
+    "description": "Text when a deadline is selected",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "2025-12-31"
+      }
+    }
+  },
+  "@addTask": {
+    "description": "Add task button text"
+  },
+  "@selectDeadlineError": {
+    "description": "Error message if no date is selected"
+  },
+  "@enterTaskNameError": {
+    "description": "Error message if no name is entered"
+  },
+  "@creationError": {
+    "description": "Error message during creation",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "@progressLabel": {
+    "description": "Label for progress in the card"
+  },
+  "@timeElapsedLabel": {
+    "description": "Label for time elapsed in the card"
+  },
+  "@deadlineLabel": {
+    "description": "Label for deadline in the card",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "2025-12-31"
+      }
+    }
+  }
 }
