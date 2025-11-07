@@ -23,7 +23,7 @@ class Consultation extends StatefulWidget {
   State<Consultation> createState() => _ConsultationState();
 }
 
-class _ConsultationState extends State<Consultation> {
+class _ConsultationState extends State<Consultation> with WidgetsBindingObserver{
   int _selectedIndex = 0;
   final ImagePicker picker = ImagePicker();
   late ReponseDetailTache detailTache;
@@ -43,6 +43,7 @@ class _ConsultationState extends State<Consultation> {
       dateLimite: DateTime.now(),
       changements: [],
     );
+    WidgetsBinding.instance.addObserver(this);
     chargerDetailTache();
   }
 
@@ -50,6 +51,20 @@ class _ConsultationState extends State<Consultation> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      chargerDetailTache();
+    }
   }
 
   double calculerPourcentageTempsRestant() {
@@ -115,7 +130,6 @@ class _ConsultationState extends State<Consultation> {
       if (widget.tache.id <= 0) {
         throw Exception("ID de tâche invalide");
       }
-      print("Chargement détail tâche ID: ${widget.tache.id}");
       Response response = await SingletonDio.getDio().get(
         "http://10.0.2.2:8080/api/detail/photo/${widget.tache.id}",
       );
@@ -184,8 +198,6 @@ class _ConsultationState extends State<Consultation> {
         setState(() {
           imagePath = imageUrl;
         });
-
-        await chargerDetailTache();
       }
     } catch (e) {
       print("Erreur lors de l’envoi de l’image : $e");
