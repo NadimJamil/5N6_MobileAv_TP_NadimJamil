@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "895590588645",
+    "project_id": "fluttertp3appmobileav",
+    "storage_bucket": "fluttertp3appmobileav.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895590588645:android:f6915a61a7b50e2955740c",
+        "android_client_info": {
+          "package_name": "com.example.frontendtp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2fWK62G4wlQPJ3maohmMxru2VaejdzRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
