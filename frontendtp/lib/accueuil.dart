@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/class/reponseAccueilItemAvecPhoto.dart';
@@ -32,6 +33,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = true;
   bool isLoadingDeconnexion = false;
+  final Dio _dio = Dio();
+  String? _token;
+  bool _isLoading = false;
+  String _message = "Aucune action effectuée";
+  String apiUrl = "http://10.0.2.2:8080";
 
   void _onItemTapped(int index) {
     setState(() {
@@ -44,12 +50,65 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     chargerAccueilAvecPhoto();
+    recupToken();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> recupToken() async {
+    setState(() {
+      _isLoading = true;
+      _message = "Récupération du token...";
+    });
+
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        setState(() {
+          _token = token;
+        });
+
+        await enregistrerJeton(token);
+        print("Jeton enregistré : $token");
+      } else {
+        setState(() {
+          _message = "Erreur : Token null";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = "Erreur lors de l'enregistrement : $e";
+      });
+      print("Erreur lors de l'enregistrement du jeton : $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> enregistrerJeton(String token) async {
+    try {
+      final response = await _dio.post(
+        '$apiUrl/enregistrer-jeton-notification',
+        data: token,
+        options: Options(headers: {'Content-Type': 'text/plain'}),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          _message = "✅ ${response.data}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = "❌ Erreur: $e";
+      });
+      print("Erreur lors de l'enregistrement du jeton : $e");
+    }
   }
 
   @override
@@ -213,6 +272,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
                 ),
               )
                   : null,
+            ),
+            ListTile(
+              title: const Text("Recevoir des notifications"),
+              onTap: () async {
+                Navigator.pop(context);
+                await recupToken();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Jeton renvoyé au serveur")),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text("Test notification"),
+              onTap: () async {
+                Navigator.pop(context);
+                try {
+                  final response = await _dio.post(
+                    "$apiUrl/test/notifications",
+                  );
+
+                  if (response.statusCode == 200) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Notification test envoyée")),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Erreur : ${response.statusCode}")),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Erreur d’envoi : $e")),
+                  );
+                }
+              },
             ),
           ],
         ),

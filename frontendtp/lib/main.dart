@@ -4,6 +4,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontendtp/inscription.dart';
 import 'firebase_options.dart';
 import 'generated/l10n.dart';
+import 'notification/notification_service.dart';
+
+final GlobalKey<ScaffoldMessengerState> snackbarKey =
+GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,12 +17,24 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    setupFirebaseMessaging();
+  }
+  @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      scaffoldMessengerKey: snackbarKey,
       localizationsDelegates: [
         S.delegate,
         GlobalMaterialLocalizations.delegate,
