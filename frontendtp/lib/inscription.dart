@@ -1,10 +1,12 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/Connexion.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
+import 'package:frontendtp/auth/authentification.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
 import 'class/requeteInscription.dart';
 import 'generated/l10n.dart';
@@ -25,6 +27,16 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
+    FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in! ' + user.email!);
+      }
+    }
+    );
     _usernameController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -74,6 +86,9 @@ class _SignUpPageState extends State<SignUpPage> {
       navPageAccueuil();
       isLoading = false;
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).signupFailed)),
@@ -186,6 +201,23 @@ class _SignUpPageState extends State<SignUpPage> {
                 elevation: 5,
               ),
               child: Text(S.of(context).continueBtn),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () => AuthService().signInWithGoogle(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 64, vertical: 16),
+                textStyle: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 5,
+              ),
+              child: Text("Se connecter avec Google"),
             ),
             const SizedBox(height: 32),
             Text(

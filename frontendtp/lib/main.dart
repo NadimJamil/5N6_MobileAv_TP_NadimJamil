@@ -5,6 +5,8 @@ import 'package:frontendtp/inscription.dart';
 import 'firebase_options.dart';
 import 'generated/l10n.dart';
 import 'notification/notification_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 
 final GlobalKey<ScaffoldMessengerState> snackbarKey =
 GlobalKey<ScaffoldMessengerState>();
@@ -14,6 +16,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  GoogleSignIn.instance.initialize();
   runApp(const MyApp());
 }
 

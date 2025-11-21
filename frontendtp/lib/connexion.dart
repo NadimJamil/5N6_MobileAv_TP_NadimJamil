@@ -71,12 +71,12 @@ class _LoginPageState extends State<LoginPage> {
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).signupFailed)),
-          );
-          setState(() {
-            isLoading = false;
-          });
-      }
-      }
+      );
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   Widget _buildPortraitLayout(BuildContext context) {
     final l10n = S.of(context)!;

@@ -33,7 +33,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = true;
   bool isLoadingDeconnexion = false;
-  final Dio _dio = Dio();
   String? _token;
   bool _isLoading = false;
   String _message = "Aucune action effectuée";
@@ -93,10 +92,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
 
   Future<void> enregistrerJeton(String token) async {
     try {
-      final response = await _dio.post(
+      final response = await SingletonDio.getDio().post(
         '$apiUrl/enregistrer-jeton-notification',
         data: token,
-        options: Options(headers: {'Content-Type': 'text/plain'}),
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -274,21 +272,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
                   : null,
             ),
             ListTile(
-              title: const Text("Recevoir des notifications"),
-              onTap: () async {
-                Navigator.pop(context);
-                await recupToken();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Jeton renvoyé au serveur")),
-                );
-              },
-            ),
-            ListTile(
               title: const Text("Test notification"),
               onTap: () async {
                 Navigator.pop(context);
                 try {
-                  final response = await _dio.post(
+                  final response = await SingletonDio.getDio().post(
                     "$apiUrl/test/notifications",
                   );
 
