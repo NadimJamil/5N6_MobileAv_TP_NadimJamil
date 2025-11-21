@@ -1,20 +1,13 @@
-import 'dart:convert';
-
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/class/reponseAccueilItemAvecPhoto.dart';
-import 'package:frontendtp/class/reponseConnexion.dart';
-import 'package:frontendtp/class/reponseDetailTacheAvecPhoto.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
-import 'package:path_provider/path_provider.dart';
-import 'class/tache.dart';
-import 'class/reponseAccueilItem.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'generated/l10n.dart';
 import 'inscription.dart';
 
@@ -29,6 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
+  final user = FirebaseAuth.instance.currentUser;
   int _selectedIndex = 0;
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = true;
@@ -146,22 +140,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
       setState(() {
         isLoadingDeconnexion = true;
       });
+      await GoogleSignIn().signOut();
+      await FirebaseAuth.instance.signOut();
 
-      final response = await SingletonDio.getDio().post(
-        'http://10.0.2.2:8080/id/deconnexion',
-      );
+      SessionUtilisateur().clear();
 
-      if (response.statusCode == 200) {
+      if (context.mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const SignUpPage()),
               (route) => false,
         );
-      } else {
-        final l10n = S.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.logoutError),
-            backgroundColor: Colors.red,
+            content: Text(S.of(context).logout ?? "Déconnexion réussie"),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -182,6 +175,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
       }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +222,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
             DrawerHeader(
               decoration: const BoxDecoration(color: Colors.blue),
               child: Text(
-                SessionUtilisateur().nomUtilisateur ?? l10n.user,
+                user?.email ?? l10n.user,
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -255,23 +250,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               },
             ),
             ListTile(
-              title: Text(l10n.logout),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                _onItemTapped(2);
-                deconnexion(context);
-              },
-              trailing: isLoadingDeconnexion
-                  ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                ),
-              )
-                  : null,
-            ),
-            ListTile(
               title: const Text("Test notification"),
               onTap: () async {
                 Navigator.pop(context);
@@ -295,6 +273,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
                   );
                 }
               },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: Text(l10n.logout),
+              selected: _selectedIndex == 2,
+              onTap: () {
+                _onItemTapped(2);
+                deconnexion(context);
+              },
+              trailing: isLoadingDeconnexion
+                  ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              )
+                  : null,
             ),
           ],
         ),

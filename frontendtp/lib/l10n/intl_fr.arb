@@ -1,13 +1,15 @@
 {
   "appTitle": "Application Todo",
   "signUp": "Inscription",
-  "usernameHint": "Entrez votre nom d'utilisateur",
+  "usernameHint": "Entrez votre courriel",
   "passwordHint": "Entrez votre mot de passe",
   "confirmPasswordHint": "Confirmez votre mot de passe",
   "continueBtn": "Continuer",
   "haveAccount": "Vous avez déjà un compte ?",
   "login": "Se connecter",
   "signupFailed": "Échec de l'inscription",
+  "logoutSuccess": "Déconnexion réussie",
+
 
   "connectionTitle": "Connexion",
   "usernameLabel": "Nom d'utilisateur",

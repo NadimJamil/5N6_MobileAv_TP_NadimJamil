@@ -69,10 +69,10 @@ class S {
     return Intl.message('Sign Up', name: 'signUp', desc: '', args: []);
   }
 
-  /// `Enter your username`
+  /// `Enter your email`
   String get usernameHint {
     return Intl.message(
-      'Enter your username',
+      'Enter your email',
       name: 'usernameHint',
       desc: '',
       args: [],
@@ -125,6 +125,16 @@ class S {
       'Sign up failed',
       name: 'signupFailed',
       desc: 'Message displayed when sign up fails',
+      args: [],
+    );
+  }
+
+  /// `Logout successful`
+  String get logoutSuccess {
+    return Intl.message(
+      'Logout successful',
+      name: 'logoutSuccess',
+      desc: '',
       args: [],
     );
   }

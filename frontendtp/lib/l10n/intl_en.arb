@@ -1,13 +1,14 @@
 {
   "appTitle": "Todo Application",
   "signUp": "Sign Up",
-  "usernameHint": "Enter your username",
+  "usernameHint": "Enter your email",
   "passwordHint": "Enter your password",
   "confirmPasswordHint": "Confirm your password",
   "continueBtn": "Continue",
   "haveAccount": "Already have an account?",
   "login": "Log In",
   "signupFailed": "Sign up failed",
+  "logoutSuccess": "Logout successful",
 
   "connectionTitle": "Login",
   "usernameLabel": "Username",

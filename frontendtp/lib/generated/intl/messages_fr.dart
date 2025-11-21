@@ -81,6 +81,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "logoutError": MessageLookupByLibrary.simpleMessage(
       "Erreur lors de la déconnexion",
     ),
+    "logoutSuccess": MessageLookupByLibrary.simpleMessage(
+      "Déconnexion réussie",
+    ),
     "menu": MessageLookupByLibrary.simpleMessage("Menu"),
     "noAccount": MessageLookupByLibrary.simpleMessage(
       "Vous n\'avez pas de compte?",
@@ -118,7 +121,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("Utilisateur"),
     "usernameHint": MessageLookupByLibrary.simpleMessage(
-      "Entrez votre nom d\'utilisateur",
+      "Entrez votre courriel",
     ),
     "usernameLabel": MessageLookupByLibrary.simpleMessage("Nom d\'utilisateur"),
   };

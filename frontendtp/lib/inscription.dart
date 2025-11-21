@@ -34,6 +34,11 @@ class _SignUpPageState extends State<SignUpPage> {
         print('User is currently signed out!');
       } else {
         print('User is signed in! ' + user.email!);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            navPageAccueuil();
+          }
+        });
       }
     }
     );
@@ -75,16 +80,32 @@ class _SignUpPageState extends State<SignUpPage> {
         motDePasse: _passwordController.text.trim(),
         confirmationMotDePasse: _confirmPasswordController.text.trim(),
       );
-      var reponse = await SingletonDio.getDio().post(
-        "http://10.0.2.2:8080/id/inscription",
-        data: req.toJson(),
-      );
 
-      print(reponse.data);
-      var rep = ReponseConnexion.fromJson(reponse.data);
-      print("Inscription réussie : ${rep.nomUtilisateur}");
-      navPageAccueuil();
-      isLoading = false;
+      if (req.motDePasse != req.confirmationMotDePasse) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Les mots de passe ne correspondent pas."),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        setState(() => isLoading = false);
+        return;
+      }
+
+      await AuthService().signUp(email: req.nom, password: req.motDePasse);
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      setState(() => isLoading = false);
+      if (currentUser != null) {
+        navPageAccueuil();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Erreur d'authentification. Veuillez réessayer."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -187,23 +208,6 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: reqInscription,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 64, vertical: 16),
-                textStyle: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 5,
-              ),
-              child: Text(S.of(context).continueBtn),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
               onPressed: () => AuthService().signInWithGoogle(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -218,6 +222,23 @@ class _SignUpPageState extends State<SignUpPage> {
                 elevation: 5,
               ),
               child: Text("Se connecter avec Google"),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: reqInscription,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 64, vertical: 16),
+                textStyle: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 5,
+              ),
+              child: Text(S.of(context).continueBtn),
             ),
             const SizedBox(height: 32),
             Text(

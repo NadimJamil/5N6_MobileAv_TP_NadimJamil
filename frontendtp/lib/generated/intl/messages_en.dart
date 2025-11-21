@@ -71,6 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "loginFailed": MessageLookupByLibrary.simpleMessage("Login failed"),
     "logout": MessageLookupByLibrary.simpleMessage("Logout"),
     "logoutError": MessageLookupByLibrary.simpleMessage("Error during logout"),
+    "logoutSuccess": MessageLookupByLibrary.simpleMessage("Logout successful"),
     "menu": MessageLookupByLibrary.simpleMessage("Menu"),
     "noAccount": MessageLookupByLibrary.simpleMessage(
       "Don\'t have an account?",
@@ -101,7 +102,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "updateError": MessageLookupByLibrary.simpleMessage("Update error"),
     "user": MessageLookupByLibrary.simpleMessage("User"),
-    "usernameHint": MessageLookupByLibrary.simpleMessage("Enter your username"),
+    "usernameHint": MessageLookupByLibrary.simpleMessage("Enter your email"),
     "usernameLabel": MessageLookupByLibrary.simpleMessage("Username"),
   };
 }
