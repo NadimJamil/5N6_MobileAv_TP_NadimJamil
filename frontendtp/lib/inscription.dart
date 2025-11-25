@@ -122,6 +122,41 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  void reqInscriptionGoogle() async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      UserCredential? userCredential = await AuthService().signInWithGoogle();
+      User? currentUser = userCredential?.user;
+      print("Utilisateur connecté: ${currentUser?.email}");
+
+      if (currentUser != null) {
+        navPageAccueuil(replace: true);
+        }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Erreur d'authentification. Veuillez réessayer."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Erreur inscription: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context).signupFailed)),
+      );
+    } finally{
+      if(mounted){
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,7 +248,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () => AuthService().signInWithGoogle(),
+              onPressed: () => reqInscriptionGoogle(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,

@@ -71,11 +71,10 @@ class _LoginPageState extends State<LoginPage> {
   void _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-
+    setState(() {
+      isLoading = true;
+    });
     try {
-      setState(() {
-        isLoading = true;
-      });
       var req = RequeteConnexion(
         nom: email,
         motDePasse: password,
@@ -84,15 +83,19 @@ class _LoginPageState extends State<LoginPage> {
       User? currentUser = FirebaseAuth.instance.currentUser;
       if(currentUser != null){
         print("Connexion réussie : ${req.nom}");
-        // SessionUtilisateur().nomUtilisateur = req.nom;
+        SessionUtilisateur().nomUtilisateur = req.nom;
         navPageAccueuil();
       }
-      isLoading = false;
+      setState(() {
+        isLoading = false;
+      });
     }
     catch (e) {
-      print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context).signupFailed)),
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
       );
       setState(() {
         isLoading = false;

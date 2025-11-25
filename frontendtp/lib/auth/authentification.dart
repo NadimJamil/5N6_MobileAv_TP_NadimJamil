@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -54,22 +56,67 @@ class AuthService{
     required String email,
     required String password,
   }) async {
-    try{
+    try {
+      print("1. Début de signIn pour: $email");
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
+      ).timeout(
+        Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception("La connexion a pris trop de temps. Vérifiez votre connexion internet.");
+        },
       );
-    } on FirebaseAuthException catch(e){
+
+      print("2. Connexion réussie");
+
+    } on FirebaseAuthException catch (e) {
+      print("FirebaseAuthException Code: ${e.code}");
+      print("FirebaseAuthException Message: ${e.message}");
+
       String message = "";
-      if(e.code == 'weak-password'){
-        message = "The password provided is too weak.";
-      } else if(e.code == 'email-already-in-use'){
-        message = "The account already exists for that email.";
+
+      switch (e.code) {
+        case 'user-not-found':
+          message = "Aucun compte trouvé avec cette adresse email.";
+          break;
+        case 'wrong-password':
+          message = "Mot de passe incorrect.";
+          break;
+        case 'invalid-email':
+          message = "L'adresse email n'est pas valide.";
+          break;
+        case 'user-disabled':
+          message = "Ce compte a été désactivé.";
+          break;
+        case 'too-many-requests':
+          message = "Trop de tentatives de connexion. Veuillez réessayer plus tard.";
+          break;
+        case 'network-request-failed':
+          message = "Erreur de connexion. Vérifiez votre connexion internet.";
+          break;
+        case 'operation-not-allowed':
+          message = "La connexion par email/mot de passe n'est pas activée.";
+          break;
+        case 'invalid-credential':
+          message = "Les informations de connexion sont invalides.";
+          break;
+        default:
+          message = "Erreur de connexion: ${e.message ?? e.code}";
       }
-      print(message);
-    }
-    catch(e){
-      print(e);
+
+      print("Message d'erreur: $message");
+      throw Exception(message);
+
+    } on TimeoutException catch (e) {
+      print("TimeoutException: $e");
+      throw Exception("La connexion a expiré. Vérifiez votre connexion internet.");
+
+    } catch (e) {
+      print("Erreur inattendue lors de la connexion: $e");
+      print("Type d'erreur: ${e.runtimeType}");
+      throw Exception("Une erreur inattendue s'est produite: ${e.toString()}");
     }
   }
 
