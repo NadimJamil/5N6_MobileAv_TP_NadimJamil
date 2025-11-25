@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   final user = FirebaseAuth.instance.currentUser;
   int _selectedIndex = 0;
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
-  bool isLoadingAccueil = true;
+  bool isLoadingAccueil = false;
   bool isLoadingDeconnexion = false;
   String? _token;
   bool _isLoading = false;
@@ -42,8 +42,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    chargerAccueilAvecPhoto();
-    recupToken();
+    // chargerAccueilAvecPhoto();
+    //recupToken();
   }
 
   @override
@@ -63,10 +63,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
       if (token != null) {
         setState(() {
           _token = token;
+          print("Jeton enregistré : $token");
         });
-
-        await enregistrerJeton(token);
-        print("Jeton enregistré : $token");
       } else {
         setState(() {
           _message = "Erreur : Token null";
@@ -107,7 +105,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      chargerAccueilAvecPhoto();
+      // chargerAccueilAvecPhoto();
     }
   }
 
@@ -115,23 +113,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (context) => const creation()));
-    chargerAccueilAvecPhoto();
+    // chargerAccueilAvecPhoto();
   }
 
-  Future<void> chargerAccueilAvecPhoto() async {
-    try {
-      setState(() => isLoadingAccueil = true);
-      Response response = await SingletonDio.getDio().get("http://10.0.2.2:8080/api/accueil/photo");
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data as List<dynamic>;
-        itemsAvecPhoto = data.map((e) => ReponseAccueilItemAvecPhoto.fromJson(e as Map<String, dynamic>)).toList();
-      }
-    } catch (e) {
-      print("Erreur chargement accueil avec photo: $e");
-    } finally {
-      setState(() => isLoadingAccueil = false);
-    }
-  }
+  // Future<void> chargerAccueilAvecPhoto() async {
+  //   try {
+  //     setState(() => isLoadingAccueil = true);
+  //     Response response = await SingletonDio.getDio().get("http://10.0.2.2:8080/api/accueil/photo");
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> data = response.data as List<dynamic>;
+  //       itemsAvecPhoto = data.map((e) => ReponseAccueilItemAvecPhoto.fromJson(e as Map<String, dynamic>)).toList();
+  //     }
+  //   } catch (e) {
+  //     print("Erreur chargement accueil avec photo: $e");
+  //   } finally {
+  //     setState(() => isLoadingAccueil = false);
+  //   }
+  // }
 
   Future<void> deconnexion(BuildContext context) async {
     if(isLoadingDeconnexion) return;
@@ -140,6 +138,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
       setState(() {
         isLoadingDeconnexion = true;
       });
+
       await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
 
@@ -237,7 +236,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               onTap: () {
                 _onItemTapped(0);
                 Navigator.pop(context);
-                chargerAccueilAvecPhoto();
+                // chargerAccueilAvecPhoto();
               },
             ),
             ListTile(

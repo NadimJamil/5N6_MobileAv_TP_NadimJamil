@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -27,6 +29,9 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
+    _usernameController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
     FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) {
@@ -42,9 +47,6 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     }
     );
-    _usernameController = TextEditingController();
-    _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
   }
 
   @override
@@ -55,26 +57,29 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  @override
-  void navPageConnection() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (context) => const LoginPage()));
+  void navPageConnection({bool replace = false}) {
+    if (!mounted) return;
+    if (replace) {
+      Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (context) => const LoginPage()));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) => const LoginPage()));
+    }
   }
 
-  @override
-  void navPageAccueuil() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (context) => const HomePage()));
+  void navPageAccueuil({bool replace = true}) {
+    if (!mounted) return;
+    if (replace) {
+      Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (context) => const HomePage()));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) => const HomePage()));
+    }
   }
 
-  @override
   void reqInscription() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
-      setState(() {
-        isLoading = true;
-      });
       var req = RequeteInscription(
         nom: _usernameController.text.trim(),
         motDePasse: _passwordController.text.trim(),
@@ -88,16 +93,13 @@ class _SignUpPageState extends State<SignUpPage> {
             backgroundColor: Colors.red,
           ),
         );
-
-        setState(() => isLoading = false);
         return;
       }
 
       await AuthService().signUp(email: req.nom, password: req.motDePasse);
       User? currentUser = FirebaseAuth.instance.currentUser;
-      setState(() => isLoading = false);
       if (currentUser != null) {
-        navPageAccueuil();
+        navPageAccueuil(replace: true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -107,13 +109,16 @@ class _SignUpPageState extends State<SignUpPage> {
         );
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
       print("Erreur inscription: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).signupFailed)),
       );
+    } finally{
+      if(mounted){
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

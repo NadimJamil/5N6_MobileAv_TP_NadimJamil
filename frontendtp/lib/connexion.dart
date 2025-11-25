@@ -1,9 +1,11 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
+import 'package:frontendtp/auth/authentification.dart';
 import 'package:frontendtp/class/reponseConnexion.dart';
 import 'package:frontendtp/class/requeteConnexion.dart';
 import 'package:frontendtp/inscription.dart';
@@ -20,9 +22,30 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final user = FirebaseAuth.instance.currentUser;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in! ' + user.email!);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            navPageAccueuil();
+          }
+        });
+      }
+    }
+    );
+  }
 
   @override
   void dispose() {
@@ -57,14 +80,13 @@ class _LoginPageState extends State<LoginPage> {
         nom: email,
         motDePasse: password,
       );
-      var reponse = await SingletonDio.getDio().post(
-        "http://10.0.2.2:8080/id/connexion",
-        data: req.toJson(),
-      );
-      var rep = ReponseConnexion.fromJson(reponse.data);
-      print("Connexion réussie : ${rep.nomUtilisateur}");
-      SessionUtilisateur().nomUtilisateur = rep.nomUtilisateur;
-      navPageAccueuil();
+      await AuthService().signIn(email: req.nom, password: req.motDePasse);
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if(currentUser != null){
+        print("Connexion réussie : ${req.nom}");
+        // SessionUtilisateur().nomUtilisateur = req.nom;
+        navPageAccueuil();
+      }
       isLoading = false;
     }
     catch (e) {

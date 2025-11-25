@@ -13,6 +13,7 @@ class AuthService{
       );
 
       User? user = FirebaseAuth.instance.currentUser;
+
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
@@ -83,5 +84,14 @@ class AuthService{
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<void> signOut() async{
+    try{
+      await FirebaseAuth.instance.signOut();
+    }
+    on FirebaseAuthException catch(e){
+      print(e);
+    }
   }
 }

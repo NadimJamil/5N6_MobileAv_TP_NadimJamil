@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,6 +17,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseAuth.instance.signOut();
   runApp(const MyApp());
 }
 
@@ -26,13 +28,42 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
     super.initState();
     setupFirebaseMessaging();
+    WidgetsBinding.instance.addObserver(this);
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.detached) {
+      _trySignOut();
+    }
+  }
+
+  Future<void> _trySignOut() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await GoogleSignIn().signOut();
+        await FirebaseAuth.instance.signOut();
+        debugPrint('Utilisateur déconnecté via lifecycle');
+      } catch (e) {
+        debugPrint('Erreur signOut: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
