@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
@@ -20,6 +22,15 @@ class _creationState extends State<creation> {
   DateTime? _dateLimite;
   bool isLoadingCreation = false;
 
+
+  @override
+  void initState(){
+    super.initState();
+    initFirebase();
+  }
+  void initFirebase() async{
+    await Firebase.initializeApp();
+  }
   @override
   void dispose() {
     _nomTacheController.dispose();
@@ -71,18 +82,22 @@ class _creationState extends State<creation> {
       return;
     }
 
-    var req = RequeteAjoutTache(_nomTacheController.text, _dateLimite!);
+    // var req = RequeteAjoutTache(_nomTacheController.text, _dateLimite!);
 
     try {
       setState(() {
         isLoadingCreation = true;
       });
 
-      var reponse = await SingletonDio.getDio().post(
-        'http://10.0.2.2:8080/tache/ajout',
-        data: req.toJson(),
-      );
-      Navigator.of(context).pop();
+      CollectionReference tacheCollection = FirebaseFirestore.instance.collection('tache');
+      await tacheCollection.add({
+        'nomTache': _nomTacheController.text,
+        'dateLimite': _dateLimite,
+      });
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
       if (mounted) {
         final l10n = S.of(context)!;

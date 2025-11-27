@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -27,6 +30,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = false;
   bool isLoadingDeconnexion = false;
+  StreamSubscription<QuerySnapshot>? _tacheSubscription;
   String? _token;
   bool _isLoading = false;
   String _message = "Aucune action effectuée";
@@ -42,13 +46,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // chargerAccueilAvecPhoto();
-    //recupToken();
+    chargerAccueilAvecPhoto();
+    recupToken();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _tacheSubscription?.cancel();
     super.dispose();
   }
 
@@ -105,7 +110,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      // chargerAccueilAvecPhoto();
+      chargerAccueilAvecPhoto();
     }
   }
 
@@ -113,23 +118,61 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (context) => const creation()));
-    // chargerAccueilAvecPhoto();
+    chargerAccueilAvecPhoto();
   }
 
-  // Future<void> chargerAccueilAvecPhoto() async {
-  //   try {
-  //     setState(() => isLoadingAccueil = true);
-  //     Response response = await SingletonDio.getDio().get("http://10.0.2.2:8080/api/accueil/photo");
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> data = response.data as List<dynamic>;
-  //       itemsAvecPhoto = data.map((e) => ReponseAccueilItemAvecPhoto.fromJson(e as Map<String, dynamic>)).toList();
-  //     }
-  //   } catch (e) {
-  //     print("Erreur chargement accueil avec photo: $e");
-  //   } finally {
-  //     setState(() => isLoadingAccueil = false);
-  //   }
-  // }
+  DateTime _parseDateLimite(dynamic dateLimite) {
+    if (dateLimite == null) return DateTime.now();
+    if (dateLimite is Timestamp) return dateLimite.toDate();
+    if (dateLimite is String) return DateTime.tryParse(dateLimite) ?? DateTime.now();
+    return DateTime.now();
+  }
+
+  ReponseAccueilItemAvecPhoto? _convertirDocument(DocumentSnapshot doc) {
+    try {
+      final data = doc.data() as Map<String, dynamic>?;
+      if (data == null) return null;
+
+      DateTime dateLimite = _parseDateLimite(data['dateLimite']);
+
+      return ReponseAccueilItemAvecPhoto(
+        id: int.tryParse(doc.id) ?? 0,
+        nom: data['nomTache'] ?? 'Sans titre',
+        pourcentageAvancement: data['pourcentageAvancement'] ?? 0,
+        pourcentageTemps: data['pourcentageTemps'] ?? 0,
+        dateLimite: dateLimite,
+        photoId: data['photoId'],
+      );
+    } catch (e) {
+      print("Erreur conversion document ${doc.id}: $e");
+      return null;
+    }
+  }
+
+  void chargerAccueilAvecPhoto() {
+    setState(() => isLoadingAccueil = true);
+
+    _tacheSubscription = FirebaseFirestore.instance
+        .collection('tache')
+        .snapshots()
+        .listen(
+          (snapshot) {
+        final taches = snapshot.docs
+            .map((doc) => _convertirDocument(doc))
+            .whereType<ReponseAccueilItemAvecPhoto>() // Filter out nulls
+            .toList();
+
+        setState(() {
+          itemsAvecPhoto = taches;
+          isLoadingAccueil = false;
+        });
+      },
+      onError: (e) {
+        print("Erreur chargement accueil avec photo: $e");
+        setState(() => isLoadingAccueil = false);
+      },
+    );
+  }
 
   Future<void> deconnexion(BuildContext context) async {
     if(isLoadingDeconnexion) return;
@@ -206,9 +249,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
             photoId: item.photoId,
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => Consultation(tache: item)
-                  )
+                MaterialPageRoute(
+                  builder: (_) => Consultation(tache: item),
+                ),
               );
             },
           );
