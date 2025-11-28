@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
   bool isLoadingAccueil = false;
   bool isLoadingDeconnexion = false;
+  bool _showDeleted = false;
   StreamSubscription<QuerySnapshot>? _tacheSubscription;
   String? _token;
   bool _isLoading = false;
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
 
       DateTime dateLimite = _parseDateLimite(data['dateLimite']);
 
-      return ReponseAccueilItemAvecPhoto(
+      final item = ReponseAccueilItemAvecPhoto(
         id: int.tryParse(doc.id) ?? 0,
         nom: data['nomTache'] ?? 'Sans titre',
         pourcentageAvancement: data['pourcentageAvancement'] ?? 0,
@@ -144,6 +145,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
         dateLimite: dateLimite,
         photoId: data['photoId'],
       );
+
+      item.docId = doc.id;
+      return item;
     } catch (e) {
       print("Erreur conversion document ${doc.id}: $e");
       return null;
@@ -160,6 +164,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
         .listen(
           (snapshot) {
         final taches = snapshot.docs
+            .where((doc) {
+              final data = doc.data() as Map<String, dynamic>?;
+              if (data == null) return false;
+              if (!_showDeleted && data.containsKey('deleted') && (data['deleted'] == true)) return false;
+              return true;
+            })
             .map((doc) => _convertirDocument(doc))
             .whereType<ReponseAccueilItemAvecPhoto>()
             .toList();
@@ -291,6 +301,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
                 _onItemTapped(1);
                 Navigator.pop(context);
                 navCreation();
+              },
+            ),
+            ListTile(
+              title: Text(_showDeleted ? 'Masquer tâches supprimées' : 'Afficher tâches supprimées'),
+              leading: Icon(_showDeleted ? Icons.visibility_off : Icons.visibility),
+              onTap: () {
+                setState(() {
+                  _showDeleted = !_showDeleted;
+                });
+                Navigator.pop(context);
+                chargerAccueilAvecPhoto();
               },
             ),
             ListTile(

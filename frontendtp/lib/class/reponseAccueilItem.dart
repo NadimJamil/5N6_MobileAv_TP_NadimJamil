@@ -6,13 +6,15 @@ class ReponseAccueilItem {
   int pourcentageAvancement;
   int pourcentageTemps;
   DateTime dateLimite;
+  String docId;
 
   ReponseAccueilItem({
     required this.id,
     required this.nom,
     required this.pourcentageAvancement,
     required this.pourcentageTemps,
-    required this.dateLimite
+    required this.dateLimite,
+    this.docId = '',
   });
 
   factory ReponseAccueilItem.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class ReponseAccueilItem {
       pourcentageAvancement: json['pourcentageAvancement'] as int,
       pourcentageTemps: json['pourcentageTemps'] as int,
       dateLimite: DateTime.parse(json['dateLimite'] as String),
+      docId: json['docId'] != null ? json['docId'] as String : '',
     );
   }
 }

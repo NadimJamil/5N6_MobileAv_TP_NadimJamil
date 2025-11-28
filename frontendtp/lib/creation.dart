@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:frontendtp/HTTP/http.dart';
 import 'package:frontendtp/accueuil.dart';
 import 'package:intl/intl.dart';
 
-import 'class/transfert.dart';
 import 'generated/l10n.dart';
 import 'inscription.dart';
 
@@ -62,7 +60,7 @@ class _creationState extends State<creation> {
   Future<void> creerTache() async {
     if (isLoadingCreation) return;
 
-    final l10n = S.of(context)!;
+    final l10n = S.of(context);
 
     if (_dateLimite == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,11 +86,43 @@ class _creationState extends State<creation> {
         isLoadingCreation = true;
       });
 
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        final String msg = 'Utilisateur non connecté. Veuillez vous reconnecter.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      DateTime now = DateTime.now();
+      int pourcentageTempsCalculated;
+      if (_dateLimite == null) {
+        pourcentageTempsCalculated = 0;
+      } else if (_dateLimite!.isBefore(now)) {
+        pourcentageTempsCalculated = 100;
+      } else {
+        pourcentageTempsCalculated = 0;
+      }
+      int pourcentageAvancementCalculated = 0;
+
+      final Map<String, dynamic> changementInitial = {
+        'valeur': pourcentageAvancementCalculated,
+        'dateChangement': now.toIso8601String(),
+      };
+
       CollectionReference tacheCollection = FirebaseFirestore.instance.collection('tache');
       await tacheCollection.add({
         'nomTache': _nomTacheController.text.trim(),
         'dateLimite': _dateLimite,
-        'userId' : user!.uid,
+        'dateCreation': now,
+        'pourcentageAvancement': pourcentageAvancementCalculated,
+        'pourcentageTemps': pourcentageTempsCalculated,
+        'changements': [changementInitial],
+        'userId': currentUser.uid,
       });
 
       if (mounted) {
@@ -100,10 +130,31 @@ class _creationState extends State<creation> {
       }
     } catch (e) {
       if (mounted) {
-        final l10n = S.of(context)!;
+        String friendlyMessage;
+        if (e is FirebaseException) {
+          switch (e.code) {
+            case 'permission-denied':
+              friendlyMessage = 'Accès refusé : vous n\'avez pas la permission de créer une tâche.';
+              break;
+            case 'unavailable':
+              friendlyMessage = 'Service temporairement indisponible. Vérifiez votre connexion et réessayez.';
+              break;
+            case 'deadline-exceeded':
+              friendlyMessage = 'La requête a expiré. Réessayez plus tard.';
+              break;
+            default:
+              friendlyMessage = e.message ?? 'Erreur Firebase (${e.code}).';
+          }
+        } else if (e is Exception) {
+          friendlyMessage = 'Erreur lors de la création : ${e.toString()}';
+        } else {
+          friendlyMessage = 'Erreur inconnue lors de la création.';
+        }
+        print('creerTache error: $e');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.creationError(e.toString())),
+            content: Text(friendlyMessage),
             backgroundColor: Colors.red,
           ),
         );
@@ -119,7 +170,7 @@ class _creationState extends State<creation> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = S.of(context)!;
+    final l10n = S.of(context);
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(205, 200, 205, 0.6),
