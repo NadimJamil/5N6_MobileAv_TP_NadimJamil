@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   String _message = "Aucune action effectuée";
   String apiUrl = "http://10.0.2.2:8080";
 
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -154,12 +155,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
 
     _tacheSubscription = FirebaseFirestore.instance
         .collection('tache')
+        .where('userId', isEqualTo: user!.uid)
         .snapshots()
         .listen(
           (snapshot) {
         final taches = snapshot.docs
             .map((doc) => _convertirDocument(doc))
-            .whereType<ReponseAccueilItemAvecPhoto>() // Filter out nulls
+            .whereType<ReponseAccueilItemAvecPhoto>()
             .toList();
 
         setState(() {

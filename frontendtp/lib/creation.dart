@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
@@ -21,7 +22,7 @@ class _creationState extends State<creation> {
   final TextEditingController _nomTacheController = TextEditingController();
   DateTime? _dateLimite;
   bool isLoadingCreation = false;
-
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState(){
@@ -72,7 +73,7 @@ class _creationState extends State<creation> {
       );
       return;
     }
-    if (_nomTacheController.text.isEmpty) {
+    if (_nomTacheController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.enterTaskNameError),
@@ -82,8 +83,6 @@ class _creationState extends State<creation> {
       return;
     }
 
-    // var req = RequeteAjoutTache(_nomTacheController.text, _dateLimite!);
-
     try {
       setState(() {
         isLoadingCreation = true;
@@ -91,8 +90,9 @@ class _creationState extends State<creation> {
 
       CollectionReference tacheCollection = FirebaseFirestore.instance.collection('tache');
       await tacheCollection.add({
-        'nomTache': _nomTacheController.text,
+        'nomTache': _nomTacheController.text.trim(),
         'dateLimite': _dateLimite,
+        'userId' : user!.uid,
       });
 
       if (mounted) {
