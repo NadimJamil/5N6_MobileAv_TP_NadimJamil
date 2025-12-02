@@ -8,20 +8,16 @@ import '../class/tache.dart';
 import '../generated/l10n.dart';
 
 class CarteListe extends StatelessWidget {
-  final ReponseAccueilItemAvecPhoto tache;
-  final int? photoId;
+  final Tache tache;
   final VoidCallback? onTap;
 
-  const CarteListe({super.key, required this.tache, this.photoId, this.onTap});
+  const CarteListe({super.key, required this.tache, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context)!;
 
-    String? imageUrl;
-    if (tache.photoId != null) {
-      imageUrl = "http://10.0.2.2:8080/fichier/${tache.photoId}?largeur=200";
-    }
+    String? imageUrl = tache.imageUrl;
     return Card(
       color: Colors.blue,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -39,7 +35,7 @@ class CarteListe extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tache.nom,
+                      tache.nomTache,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

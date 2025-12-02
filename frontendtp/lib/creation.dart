@@ -58,6 +58,7 @@ class _creationState extends State<creation> {
   }
 
   Future<void> creerTache() async {
+    String? imageUrl;
     if (isLoadingCreation) return;
 
     final l10n = S.of(context);
@@ -123,6 +124,7 @@ class _creationState extends State<creation> {
         'pourcentageTemps': pourcentageTempsCalculated,
         'changements': [changementInitial],
         'userId': currentUser.uid,
+        'imageUrl': imageUrl,
       });
 
       if (mounted) {

@@ -11,6 +11,7 @@ import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'class/tache.dart';
 import 'generated/l10n.dart';
 import 'inscription.dart';
 
@@ -27,7 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   final user = FirebaseAuth.instance.currentUser;
   int _selectedIndex = 0;
-  List<ReponseAccueilItemAvecPhoto> itemsAvecPhoto = [];
+  List<Tache> itemsAvecPhoto = [];
   bool isLoadingAccueil = false;
   bool isLoadingDeconnexion = false;
   bool _showDeleted = false;
@@ -126,28 +127,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   DateTime _parseDateLimite(dynamic dateLimite) {
     if (dateLimite == null) return DateTime.now();
     if (dateLimite is Timestamp) return dateLimite.toDate();
+    if (dateLimite is DateTime) return dateLimite;
     if (dateLimite is String) return DateTime.tryParse(dateLimite) ?? DateTime.now();
     return DateTime.now();
   }
 
-  ReponseAccueilItemAvecPhoto? _convertirDocument(DocumentSnapshot doc) {
+  int _computePourcentageTemps(dynamic dateDebutRaw, dynamic dateLimiteRaw) {
+    final DateTime now = DateTime.now();
+    final DateTime dateLimite = _parseDateLimite(dateLimiteRaw);
+
+    if (dateDebutRaw == null) {
+      return now.isAfter(dateLimite) ? 100 : 0;
+    }
+
+    final DateTime dateDebut = _parseDateLimite(dateDebutRaw);
+
+    final int totalMs = dateLimite.difference(dateDebut).inMilliseconds;
+    if (totalMs <= 0) {
+      return now.isAfter(dateLimite) ? 100 : 0;
+    }
+
+    if (now.isBefore(dateDebut)) return 0;
+    if (now.isAfter(dateLimite)) return 100;
+
+    final int elapsedMs = now.difference(dateDebut).inMilliseconds;
+    final double pct = (elapsedMs / totalMs) * 100.0;
+    return pct.clamp(0, 100).round();
+  }
+
+  Tache? _convertirDocument(DocumentSnapshot doc) {
     try {
-      final data = doc.data() as Map<String, dynamic>?;
-      if (data == null) return null;
-
-      DateTime dateLimite = _parseDateLimite(data['dateLimite']);
-
-      final item = ReponseAccueilItemAvecPhoto(
-        id: int.tryParse(doc.id) ?? 0,
-        nom: data['nomTache'] ?? 'Sans titre',
-        pourcentageAvancement: data['pourcentageAvancement'] ?? 0,
-        pourcentageTemps: data['pourcentageTemps'] ?? 0,
-        dateLimite: dateLimite,
-        photoId: data['photoId'],
-      );
-
-      item.docId = doc.id;
-      return item;
+      return Tache.fromFirestore(doc);
     } catch (e) {
       print("Erreur conversion document ${doc.id}: $e");
       return null;
@@ -171,7 +181,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               return true;
             })
             .map((doc) => _convertirDocument(doc))
-            .whereType<ReponseAccueilItemAvecPhoto>()
+            .whereType<Tache>()
             .toList();
 
         setState(() {
@@ -258,7 +268,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
           final item = itemsAvecPhoto[index];
           return CarteListe(
             tache: item,
-            photoId: item.photoId,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(

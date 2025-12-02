@@ -1,18 +1,38 @@
-import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Tache {
-  String idTache;
-  String nom;
-  double avancement;
-  double tempsEcoule;
-  DateTime dateCreation;
-  DateTime dateLimite;
+  final String docId;
+  final String nomTache;
+  final DateTime dateLimite;
+  final DateTime dateCreation;
+  final int pourcentageAvancement;
+  final double pourcentageTemps;
+  final String? imageUrl;
+  final bool deleted;
 
   Tache({
-    required this.nom,
-    required this.avancement,
-    required this.tempsEcoule,
+    required this.docId,
+    required this.nomTache,
     required this.dateLimite,
-  })  : idTache = const Uuid().v4(),
-        dateCreation = DateTime.now();
+    required this.dateCreation,
+    required this.pourcentageAvancement,
+    required this.pourcentageTemps,
+    this.imageUrl,
+    this.deleted = false,
+  });
+
+  factory Tache.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return Tache(
+      docId: doc.id,
+      nomTache: data['nomTache'] ?? '',
+      dateLimite: (data['dateLimite'] as Timestamp).toDate(),
+      dateCreation: (data['dateCreation'] as Timestamp).toDate(),
+      pourcentageAvancement: data['pourcentageAvancement'] ?? 0,
+      pourcentageTemps: data['pourcentageTemps']?.toDouble() ?? 0.0,
+      imageUrl: data['imageUrl'], // ← ONLY THIS FIELD
+      deleted: data['deleted'] == true,
+    );
+  }
 }

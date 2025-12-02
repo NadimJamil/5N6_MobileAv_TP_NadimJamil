@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontendtp/inscription.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options.dart';
 import 'generated/l10n.dart';
 import 'notification/notification_service.dart';
@@ -12,8 +13,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 final GlobalKey<ScaffoldMessengerState> snackbarKey =
 GlobalKey<ScaffoldMessengerState>();
 
+const supabaseUrl = 'https://bcwqqjtlrcflpkndgvmx.supabase.co';
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjd3FxanRscmNmbHBrbmRndm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3MDEyODMsImV4cCI6MjA4MDI3NzI4M30.M7gwC6JUmpUkUFF7oTi0BUpWv_MpBZmsxee0BKvhLic";
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

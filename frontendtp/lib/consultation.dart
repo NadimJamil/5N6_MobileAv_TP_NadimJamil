@@ -1,11 +1,11 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frontendtp/HTTP/http.dart';
-import 'package:frontendtp/class/reponseAccueilItem.dart';
+import 'package:frontendtp/class/tache.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide MultipartFile;
 
 import 'accueuil.dart';
 import 'creation.dart';
@@ -13,7 +13,7 @@ import 'generated/l10n.dart';
 import 'inscription.dart';
 
 class Consultation extends StatefulWidget {
-  final ReponseAccueilItem tache;
+  final Tache tache;
 
   const Consultation({super.key, required this.tache});
 
@@ -22,17 +22,12 @@ class Consultation extends StatefulWidget {
 }
 
 class _ConsultationState extends State<Consultation> with WidgetsBindingObserver {
-  // Constants
-  static const String _baseUrl = "http://10.0.2.2:8080";
   static const String _tacheCollection = 'tache';
 
-  // UI State
   int _selectedIndex = 0;
   bool _isLoading = true;
   bool _isLoadingProgress = false;
-
-  // Task Data
-  late int _taskId;
+  final supabase = Supabase.instance.client;
   late String _taskDocId;
   String _taskName = '';
   DateTime _deadline = DateTime.now();
@@ -40,7 +35,7 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
   List<Map<String, dynamic>> _progressHistory = [];
   String? _imagePath;
   bool _isDeleted = false;
-
+  final String bucketName = "supaBucket";
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -65,18 +60,13 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     }
   }
 
-  // Initialize task data from widget
   void _initializeTaskData() {
-    _taskId = widget.tache.id;
-    _taskName = widget.tache.nom;
+    _taskDocId = widget.tache.docId;
+    _taskName = widget.tache.nomTache;
     _progressPercentage = widget.tache.pourcentageAvancement;
     _deadline = widget.tache.dateLimite;
-    _taskDocId = widget.tache.docId.isNotEmpty
-        ? widget.tache.docId
-        : widget.tache.id.toString();
   }
 
-  // Calculate elapsed time percentage
   double _calculateTimeElapsedPercentage() {
     final now = DateTime.now();
 
@@ -101,7 +91,6 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     return ((elapsedDuration / totalDuration) * 100).clamp(0.0, 100.0);
   }
 
-  // Parse date from various formats
   DateTime? _parseDate(dynamic date) {
     if (date is DateTime) return date;
     if (date is Timestamp) return date.toDate();
@@ -109,7 +98,6 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     return null;
   }
 
-  // Load task details from Firestore
   Future<void> _loadTaskDetails() async {
     if (!mounted) return;
 
@@ -133,9 +121,7 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
           _deadline = _parseDate(data['dateLimite']) ?? _deadline;
           _progressPercentage = _parseIntValue(data['pourcentageAvancement']);
           _progressHistory = _parseProgressHistory(data['changements']);
-          _imagePath = data['photoId'] != null
-              ? "$_baseUrl/fichier/${data['photoId']}?largeur=1080"
-              : null;
+          _imagePath = data['imageUrl'];
           _isDeleted = data['deleted'] == true;
           _isLoading = false;
         });
@@ -149,13 +135,11 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     }
   }
 
-  // Parse integer value safely
   int _parseIntValue(dynamic value) {
     if (value is num) return value.toInt();
     return int.tryParse(value?.toString() ?? '0') ?? 0;
   }
 
-  // Parse progress history from Firestore data
   List<Map<String, dynamic>> _parseProgressHistory(dynamic rawChangements) {
     if (rawChangements is! List) return [];
 
@@ -174,7 +158,6 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     }).toList();
   }
 
-  // Update progress percentage
   Future<void> _updateProgress(int newValue) async {
     if (_isLoadingProgress || !mounted) return;
 
@@ -231,37 +214,37 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     }
   }
 
-  // Select and upload image
   Future<void> _selectAndUploadImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
+    File file = File(image.path);
+    String fileName = image.name;
 
-    try {
-      final formData = FormData.fromMap({
-        "file": await MultipartFile.fromFile(image.path, filename: image.name),
-        "taskID": _taskId.toString(),
+
+    try{
+      final String fullPath = await supabase
+          .storage
+          .from(bucketName)
+          .upload(fileName, file);
+      String url = supabase
+          .storage
+          .from(bucketName)
+          .getPublicUrl(fileName);
+      FirebaseFirestore.instance.collection('tache').doc(_taskDocId).update({
+        'imageUrl': url,
       });
-
-      final response = await SingletonDio.getDio().post(
-        "$_baseUrl/fichier",
-        data: formData,
-      );
-
-      if (response.statusCode == 200 && mounted) {
-        final imageId = response.data.toString();
-        setState(() {
-          _imagePath = "$_baseUrl/fichier/$imageId?largeur=1080";
-        });
-      }
-    } catch (e) {
-      debugPrint("Error uploading image: $e");
-      if (mounted) {
-        _showErrorSnackBar('Failed to upload image');
-      }
+      setState(() {
+        _imagePath = url;
+      });
+      _showSuccessSnackBar("Image mise à jour !");
     }
-  }
+    catch(e){
+      debugPrint("Error uploading image: $e");
+      _showErrorSnackBar("Erreur lors de l'upload de l'image : $e");
+      return;
+    }
+    }
 
-  // Show error snackbar
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -271,14 +254,12 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
     );
   }
 
-  // Show success snackbar
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
-  // Handle navigation
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }
@@ -305,7 +286,6 @@ class _ConsultationState extends State<Consultation> with WidgetsBindingObserver
   }
 
   Future<void> _showDeleteOptions() async {
-    // dialog with options soft/hard delete
     final choice = await showDialog<String?>(
       context: context,
       builder: (ctx) => AlertDialog(
