@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:frontendtp/HTTP/http.dart';
-import 'package:frontendtp/class/reponseAccueilItemAvecPhoto.dart';
 import 'package:frontendtp/classExterne/designCarteListe.dart';
 import 'package:frontendtp/consultation.dart';
 import 'package:frontendtp/creation.dart';
@@ -168,8 +166,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
     setState(() => isLoadingAccueil = true);
 
     _tacheSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
         .collection('tache')
-        .where('userId', isEqualTo: user!.uid)
         .snapshots()
         .listen(
           (snapshot) {
